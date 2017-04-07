@@ -1,7 +1,7 @@
 <style>
     .logo{width: 270px;display: block;height: 60px;float: left;}
     .nav-menu{display: block;float: left;}
-    .col-menu{display: block;width: 270px;float: left;clear: both;}
+    .col-menu{display: block;width: 270px;float: left;clear: both;background: #eef1f6;}
     #content{display: block;float: left;}
     footer{border:1px solid;display: block;width: 100%;height: 60px;float: left;}
 </style>
@@ -23,7 +23,7 @@
         </nav>
 
         <!-- 侧栏 -->
-        <div class="col-menu">
+        <div class="col-menu" :style="colMenuStyle">
             <el-row class="tac" style="width: 100%;">
                 <el-col :span="8" style="width: 100%;">
                     <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
@@ -34,7 +34,13 @@
                             <el-menu-item index="1-2"><router-link to="/test2" style="display: block;width: 100%;text-decoration: none;color: black;">选项2</router-link></el-menu-item>
 
                         </el-submenu>
-                        <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
+                        <el-submenu index="2">
+                            <template slot="title"><i class="el-icon-menu"></i>导航二</template>
+
+                            <el-menu-item index="1-1"><router-link to="/test" style="display: block;width: 100%;text-decoration: none;color: black;">选项1</router-link></el-menu-item>
+                            <el-menu-item index="1-2"><router-link to="/test2" style="display: block;width: 100%;text-decoration: none;color: black;">选项2</router-link></el-menu-item>
+
+                        </el-submenu>
                         <el-menu-item index="3"><i class="el-icon-setting"></i>导航三</el-menu-item>
                     </el-menu>
                 </el-col>
@@ -57,13 +63,17 @@
         },
         computed:{
             navMenuStyle: function () {
-                let width = (this.totalWidth - 270 - 20) + 'px';
+                let width = (this.totalWidth - 270 - 40) + 'px';
                 return {'height':'60px','width': width};
             },
             contentStyle: function () {
-                let width = (this.totalWidth - 270 - 20) + 'px';
+                let width = (this.totalWidth - 270 - 40) + 'px';
                 let height = (this.totalHeight -120 - 10) + 'px';
                 return {'height': height,'width': width};
+            },
+            colMenuStyle: function () {
+                let height = (this.totalHeight -120 - 10) + 'px';
+                return {'height': height,'width': '270px'};
             }
         },
         data: function() {
@@ -86,7 +96,7 @@
         watch:{
             contentStyle(val){
                 if (!this.timer) { //优化 因为 频繁 触发 resize 函数，导致页面很卡的 问题
-                    this.contentStyle['width'] = (this.totalWidth - 270 - 20) + 'px';
+                    this.contentStyle['width'] = (this.totalWidth - 270 - 40) + 'px';
                     this.contentStyle['height'] = (this.totalHeight - 120 - 10) + 'px';
                     this.timer = true
                     let that = this
@@ -99,7 +109,18 @@
             },
             navMenuStyle(val){
                 if (!this.timer) { //优化 因为 频繁 触发 resize 函数，导致页面很卡的 问题
-                    this.contentStyle['width'] = (this.totalWidth - 270 - 20) + 'px';
+                    this.navMenuStyle['width'] = (this.totalWidth - 270 - 40) + 'px';
+                    this.timer = true
+                    let that = this
+                    setTimeout(function () {
+                        that.init()
+                        that.timer = false
+                    }, 400)
+                }
+            },
+            colMenuStyle(val){
+                if (!this.timer) { //优化 因为 频繁 触发 resize 函数，导致页面很卡的 问题
+                    this.colMenuStyle['height'] = (this.totalHeight - 120 - 10) + 'px';
                     this.timer = true
                     let that = this
                     setTimeout(function () {
