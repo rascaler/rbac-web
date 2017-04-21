@@ -6,6 +6,7 @@ import VueRouter from 'vue-router';
 import App from './App.vue';
 import ElementUI from 'element-ui';
 
+
 Vue.use(ElementUI);
 Vue.use(VueRouter);
 
