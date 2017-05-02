@@ -4,7 +4,6 @@
     </div>
 </template>
 <script>
-  import CONSTANT from '../router/ApiUrl'
 
   export default {
     name: 'example',
@@ -13,7 +12,7 @@
       }
     },
     created: function () {
-      this.$http.get(CONSTANT.EXAMPLE)
+      this.$http.get(this.CONSTANT.EXAMPLE)
         .then((response) => {
           this.$set('gridData', response.data)
         })
