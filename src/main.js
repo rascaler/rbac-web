@@ -7,6 +7,7 @@ import VueResource from 'vue-resource'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import CONSTANT from './router/ApiUrl'
+import './assets/images/logo.png'
 
 Vue.use(ElementUI)
 Vue.use(VueResource)

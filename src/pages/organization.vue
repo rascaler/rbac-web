@@ -1,25 +1,111 @@
+<style>
+  .row-mt20{
+    margin-top: 20px;
+  }
+  .row-ml10{
+    margin-left: 10px;
+  }
+  .col-ml10{
+    margin-left: 10px;
+  }
+</style>
 <template>
   <div>
-    <div style="width: 300px;float: left">
-      <el-input
-        placeholder="组织名称"
-        v-model="filterText">
-      </el-input>
+    <el-row>
+      <el-col :span="5">
+        <el-input
+          placeholder="组织名称"
+          v-model="filterText">
+        </el-input>
 
-      <el-tree
-        class="filter-tree"
-        :data="data2"
-        :props="defaultProps"
-        accordion
-        node-key="id"
-        :default-expanded-keys = "expandedKeys"
-        :filter-node-method="filterNode"
-        ref="tree2">
-      </el-tree>
-    </div>
-    <div style="border: 1px solid;float: left;display: block;">
-      员工列表
-    </div>
+        <el-tree
+          class="filter-tree"
+          :data="data2"
+          :props="defaultProps"
+          accordion
+          highlight-current
+          node-key="id"
+          :default-expanded-keys = "expandedKeys"
+          :filter-node-method="filterNode"
+          @node-click="handleNodeClick"
+          ref="tree2">
+        </el-tree>
+      </el-col>
+      <el-col :span="19">
+        <!-- 搜索栏-->
+        <el-row class="row-mt20 row-ml10">
+          <form>
+            <el-col :span="5">
+              <el-col :span="8">启用状态</el-col>
+              <el-col :span="16">
+                <el-select v-model="useStateOption.value" placeholder="请选择">
+                  <el-option
+                    v-for="item in useStateOption.options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-col>
+            </el-col>
+            <el-col :span="5" class="col-ml10">
+              <el-input
+                placeholder="姓名/手机/邮箱"
+                icon="search"
+                v-model="searchParams.keyword"
+                :on-icon-click="handleIconClick">
+              </el-input>
+            </el-col>
+          </form>
+        </el-row>
+        <!-- 表格-->
+        <el-row class="row-mt20 row-ml10">
+          <el-table
+            border
+            :data="pageResult.list"
+            style="width: 100%">
+            <el-table-column
+              prop="date"
+              label="日期"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="姓名"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="address"
+              label="地址">
+            </el-table-column>
+            <el-table-column label="操作">
+              <template scope="scope">
+                <el-button
+                  size="small"
+                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button
+                  size="small"
+                  type="danger"
+                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-row>
+        <!-- 分页-->
+        <el-row class="row-mt20 row-ml10">
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page.sync="pageResult.currentPage"
+            :page-sizes="[100, 200, 300, 400]"
+            :page-size="100"
+            layout="sizes, prev, pager, next"
+            :total="pageResult.total">
+          </el-pagination>
+        </el-row>
+
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -36,7 +122,27 @@
       filterNode (value, data) {
         if (!value) return true
         return data.label.indexOf(value) !== -1
-      }
+      },
+      getOrgUsers (params) {
+        let vm = this
+        this.$http.get(this.CONSTANT.USER.GET_ORG_USERS, {
+          params: params
+        }).then((response) => {
+            let data = response.data
+            vm.pageResult.list = data
+          }).catch(function (response) {
+            console.log(response)
+          })
+      },
+      handleNodeClick (data) {
+        let vm = this
+        vm.getOrgUsers({
+            keyword: 1
+        })
+      },
+      handleSizeChange (data) {},
+      handleCurrentChange (data) {},
+      handleIconClick (data) {}
     },
 
     data () {
@@ -81,6 +187,29 @@
         defaultProps: {
           children: 'children',
           label: 'label'
+        },
+        tableData: [],
+        currentPage: 1,
+        searchParams: {
+            keyword: ''
+        },
+        useStateOption: {
+            value: '',
+            options: [{
+              value: '',
+              label: '全部'
+            }, {
+              value: '1',
+              label: '启用'
+            }, {
+              value: '0',
+              label: '禁用'
+            }]
+        },
+        pageResult: {
+            total: 1000,
+            list: [],
+            currentPage: 1
         }
       }
     }

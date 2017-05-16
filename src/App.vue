@@ -7,8 +7,8 @@
 </style>
 <template>
   <div class="container">
-    <el-row style="height: 40px">
-      <el-col :span="5"><div class="grid-content bg-purple">LOGO</div></el-col>
+    <el-row style="height: 47px">
+      <el-col :span="5"><div class="grid-content bg-purple"><img  src="./assets/images/logo.png" style="float: left"></div></el-col>
       <el-col :span="19"><div class="grid-content bg-purple-light">RBAC管理</div></el-col>
     </el-row>
     <el-row :style="contentStyle">
@@ -18,7 +18,7 @@
             <template slot="title"><i class="el-icon-message"></i>导航一</template>
 
             <el-menu-item index="1-1"><router-link to="/example" style="display: block;width: 100%;text-decoration: none;color: black;">选项1</router-link></el-menu-item>
-            <el-menu-item index="1-2"><router-link to="/organization" style="display: block;width: 100%;text-decoration: none;color: black;">选项2</router-link></el-menu-item>
+            <el-menu-item index="1-2"><router-link to="/organization" style="display: block;width: 100%;text-decoration: none;color: black;">组织</router-link></el-menu-item>
 
           </el-submenu>
           <el-submenu index="2">
@@ -45,7 +45,7 @@
     },
     computed: {
       contentStyle: function () {
-        let height = (this.totalHeight - 60) + 'px'
+        let height = (this.totalHeight - 67) + 'px'
         return {'height': height}
       }
     },
@@ -69,8 +69,7 @@
     watch: {
       contentStyle (val) {
         if (!this.timer) { // 优化 因为 频繁 触发 resize 函数，导致页面很卡的 问题
-          this.contentStyle['width'] = (this.totalWidth - 270 - 40) + 'px'
-          this.contentStyle['height'] = (this.totalHeight - 120 - 10) + 'px'
+          this.contentStyle['height'] = (this.totalHeight - 67) + 'px'
           this.timer = true
           let that = this
           setTimeout(function () {
@@ -82,7 +81,8 @@
     },
     beforeDestroy: function () {},
     methods: {
-
+      handleOpen (data) {},
+      handleClose (data) {}
     }
   }
 </script>
