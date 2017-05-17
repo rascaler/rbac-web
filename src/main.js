@@ -6,13 +6,20 @@ import router from './router'
 import VueResource from 'vue-resource'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
-import CONSTANT from './router/ApiUrl'
 import './assets/images/logo.png'
 
 Vue.use(ElementUI)
 Vue.use(VueResource)
-Vue.prototype.CONSTANT = CONSTANT
-
+// 分环境配置
+if (process.env.NODE_ENV === 'development') {
+  let API_URL = require('./router/ApiUrl').default
+  buildUrl('http://localhost:9090/', API_URL)
+  Vue.prototype.API_URL = API_URL
+} else {
+  let API_URL = require('./router/ApiUrl').default
+  buildUrl('http://localhost:8888/', API_URL)
+  Vue.prototype.API_URL = API_URL
+}
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
@@ -22,3 +29,14 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+function buildUrl (domain, apiUrlObj) {
+  if (!(apiUrlObj instanceof Object)) return
+  for (let item in apiUrlObj) {
+    if (apiUrlObj[item] instanceof Object) {
+      buildUrl(domain, apiUrlObj[item])
+    } else {
+      apiUrlObj[item] = domain + apiUrlObj[item]
+    }
+  }
+}

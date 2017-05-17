@@ -1,7 +1,10 @@
-const CONSTANT = {
+const API_URL = {
   EXAMPLE: 'static/user.json',
   USER: {
-    GET_ORG_USERS: 'static/res_temp/user/user_list_A.json'
+    GET_ORG_USERS: 'user/pageUsers'
+  },
+  ORGANIZATION: {
+    GET_ORG_TREE: 'organization/getOrgTree'
   }
 }
-export default CONSTANT
+export default API_URL

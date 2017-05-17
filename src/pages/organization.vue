@@ -19,19 +19,19 @@
         <el-button type="primary" class="row-mt20 wd-persent100" icon="plus">添加</el-button>
         <el-input
           placeholder="组织名称"
-          v-model="filterText">
+          v-model="orgTreeConfig.filterText">
         </el-input>
 
         <el-tree
           class="filter-tree"
-          :data="data2"
-          :props="defaultProps"
+          :data="orgTreeConfig.data"
+          :props="orgTreeConfig.defaultProps"
           accordion
           highlight-current
           node-key="id"
-          :default-expanded-keys = "expandedKeys"
-          :filter-node-method="filterNode"
-          @node-click="handleNodeClick"
+          :default-expanded-keys = "orgTreeConfig.expandedKeys"
+          :filter-node-method="orgTreeConfig_filterNode"
+          @node-click="orgTreeConfig_handleNodeClick"
           ref="tree2">
         </el-tree>
       </el-col>
@@ -139,20 +139,37 @@
 <script>
   export default {
     name: 'organization',
+    mounted () {
+        let vm = this
+      // orgTreeConfig
+      vm.orgTreeConfig_initData()
+    },
     watch: {
       filterText (val) {
         this.$refs.tree2.filter(val)
       }
     },
-
     methods: {
-      filterNode (value, data) {
+      // >>>>>>>>>>>>>>>>>>orgTreeConfig<<<<<<<<<<<<<<<<<<<<<<
+      orgTreeConfig_filterNode (value, data) {
         if (!value) return true
         return data.label.indexOf(value) !== -1
       },
+      orgTreeConfig_initData () {
+        let vm = this
+        this.$http.get(this.API_URL.ORGANIZATION.GET_ORG_TREE, {
+        }).then((response) => {
+          let res = response.data
+          if (res && res.ecode === '1000') {
+            vm.orgTreeConfig.data = res.data
+          }
+        }).catch(function (response) {
+          console.log(response)
+        })
+      },
       getOrgUsers (params) {
         let vm = this
-        this.$http.get(this.CONSTANT.USER.GET_ORG_USERS, {
+        this.$http.get(this.API_URL.USER.GET_ORG_USERS, {
           params: params
         }).then((response) => {
             let data = response.data
@@ -161,7 +178,7 @@
             console.log(response)
           })
       },
-      handleNodeClick (data) {
+      orgTreeConfig_handleNodeClick (data) {
         let vm = this
         vm.getOrgUsers({
             keyword: 1
@@ -174,47 +191,6 @@
 
     data () {
       return {
-        filterText: '',
-        data2: [{
-          id: 1,
-          label: 'XXXX公司',
-          children: [{
-            id: 4,
-            label: '研发部门',
-            children: [{
-              id: 9,
-              label: 'A组'
-            }, {
-              id: 10,
-              label: 'B组'
-            }]
-          }, {
-            id: 2,
-            label: '运营部门',
-            children: [{
-              id: 5,
-              label: 'A组'
-            }, {
-              id: 6,
-              label: 'B组'
-            }]
-          }, {
-            id: 3,
-            label: '客服部门',
-            children: [{
-              id: 7,
-              label: 'A组'
-            }, {
-              id: 8,
-              label: 'B组'
-            }]
-          }]
-        }],
-        expandedKeys: [1],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        },
         tableData: [],
         currentPage: 1,
         searchParams: {
@@ -252,7 +228,16 @@
           resource: '',
           desc: ''
         },
-        formLabelWidth: '120px'
+        formLabelWidth: '120px',
+        orgTreeConfig: {
+          defaultProps: {
+            children: 'children',
+            label: 'name'
+          },
+          data: [],
+          filterText: '',
+          expandedKeys: [1]
+        }
       }
     }
   }
