@@ -8,11 +8,15 @@
   .col-ml10{
     margin-left: 10px;
   }
+  .wd-persent100{
+    width: 100%;
+  }
 </style>
 <template>
   <div>
     <el-row>
       <el-col :span="5">
+        <el-button type="primary" class="row-mt20 wd-persent100" icon="plus">添加</el-button>
         <el-input
           placeholder="组织名称"
           v-model="filterText">
@@ -33,37 +37,35 @@
       </el-col>
       <el-col :span="19">
         <!-- 搜索栏-->
-        <el-row class="row-mt20 row-ml10">
-          <form>
-            <el-col :span="5">
-              <el-col :span="8">启用状态</el-col>
-              <el-col :span="16">
-                <el-select v-model="useStateOption.value" placeholder="请选择">
-                  <el-option
-                    v-for="item in useStateOption.options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-col>
+        <el-row :gutter="10">
+          <el-col :span="5">
+            <el-col :span="8">启用状态</el-col>
+            <el-col :span="16">
+              <el-select v-model="useStateOption.value" placeholder="请选择">
+                <el-option
+                  v-for="item in useStateOption.options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-col>
-            <el-col :span="5" class="col-ml10">
-              <el-input
-                placeholder="姓名/手机/邮箱"
-                icon="search"
-                v-model="searchParams.keyword"
-                :on-icon-click="handleIconClick">
-              </el-input>
-            </el-col>
-          </form>
+          </el-col>
+          <el-col :span="5" class="col-ml10">
+            <el-input
+              placeholder="姓名/手机/邮箱"
+              icon="search"
+              v-model="searchParams.keyword"
+              :on-icon-click="handleIconClick">
+            </el-input>
+          </el-col>
         </el-row>
         <!-- 操作栏-->
-        <el-row class="row-mt20 row-ml10">
+        <el-row>
           <el-button type="primary" icon="plus" @click="dialogOption.visible = true">添加</el-button>
         </el-row>
         <!-- 表格-->
-        <el-row class="row-mt20 row-ml10">
+        <el-row>
           <el-table
             border
             :data="pageResult.list"
@@ -96,7 +98,7 @@
           </el-table>
         </el-row>
         <!-- 分页-->
-        <el-row class="row-mt20 row-ml10">
+        <el-row>
           <el-pagination
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
