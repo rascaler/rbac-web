@@ -32,7 +32,7 @@
           :default-expanded-keys = "orgTreeConfig.expandedKeys"
           :filter-node-method="orgTreeConfig_filterNode"
           @node-click="orgTreeConfig_handleNodeClick"
-          ref="tree2">
+          ref="orgTree">
         </el-tree>
       </el-col>
       <el-col :span="19">
@@ -135,15 +135,19 @@
       vm.orgTreeConfig_initData()
     },
     watch: {
-      filterText (val) {
-        this.$refs.tree2.filter(val)
+      'orgTreeConfig.filterText': {
+        handler (newVal, oldVal) {
+            console.log(newVal)
+          this.$refs.orgTree.filter(newVal)
+        },
+        deep: true
       }
     },
     methods: {
       // >>>>>>>>>>>>>>>>>>orgTreeConfig<<<<<<<<<<<<<<<<<<<<<<
       orgTreeConfig_filterNode (value, data) {
         if (!value) return true
-        return data.label.indexOf(value) !== -1
+        return data.name.indexOf(value) !== -1
       },
       orgTreeConfig_initData () {
         let vm = this
@@ -194,6 +198,7 @@
 
     data () {
       return {
+        filterText: '',
         useStateOption: {
             value: '',
             options: [{
