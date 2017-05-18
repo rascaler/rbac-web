@@ -32,7 +32,7 @@
         </el-menu>
       </el-col>
       <el-col :span="19">
-        <div>
+        <div style="margin: 15px;">
           <router-view></router-view>
         </div>
       </el-col>

@@ -41,7 +41,7 @@
           <el-col :span="5">
             <el-col :span="8">启用状态</el-col>
             <el-col :span="16">
-              <el-select v-model="useStateOption.value" placeholder="请选择">
+              <el-select v-model="userQuery.state" placeholder="请选择">
                 <el-option
                   v-for="item in useStateOption.options"
                   :key="item.value"
@@ -55,35 +55,25 @@
             <el-input
               placeholder="姓名/手机/邮箱"
               icon="search"
-              v-model="searchParams.keyword"
+              v-model="userQuery.keyword"
               :on-icon-click="handleIconClick">
             </el-input>
           </el-col>
         </el-row>
         <!-- 操作栏-->
         <el-row>
-          <el-button type="primary" icon="plus" @click="dialogOption.visible = true">添加</el-button>
+          <el-button type="primary" icon="plus" @click="dialogConfig.visible = true">添加</el-button>
         </el-row>
         <!-- 表格-->
         <el-row>
           <el-table
             border
-            :data="pageResult.list"
+            :data="dataGridConfig.list"
             style="width: 100%">
-            <el-table-column
-              prop="date"
-              label="日期"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="姓名"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="address"
-              label="地址">
-            </el-table-column>
+            <el-table-column prop="name" label="姓名"></el-table-column>
+            <el-table-column prop="sex" label="性别"></el-table-column>
+            <el-table-column prop="email" label="邮箱"></el-table-column>
+            <el-table-column prop="phone" label="手机"></el-table-column>
             <el-table-column label="操作">
               <template scope="scope">
                 <el-button
@@ -100,19 +90,19 @@
         <!-- 分页-->
         <el-row>
           <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page.sync="pageResult.currentPage"
-            :page-sizes="[10, 20, 30, 40]"
-            :page-size="10"
+            @size-change="dataGrid_handleSizeChange"
+            @current-change="dataGrid_handleCurrentChange"
+            :current-page.sync="dataGridConfig.pageNum"
+            :page-sizes="dataGridConfig.pageSizes"
+            :page-size="dataGridConfig.pageSize"
             layout="sizes, prev, pager, next"
-            :total="pageResult.total">
+            :total="dataGridConfig.total">
           </el-pagination>
         </el-row>
 
         <!-- 对话框-->
         <el-row>
-          <el-dialog :title="dialogOption.title" :visible.sync="dialogOption.visible">
+          <el-dialog :title="dialogConfig.title" :visible.sync="dialogConfig.visible">
             <el-form :model="form">
               <el-form-item label="活动名称" :label-width="formLabelWidth">
                 <el-input v-model="form.name" auto-complete="off"></el-input>
@@ -125,8 +115,8 @@
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogOption.visible = false">取 消</el-button>
-              <el-button type="primary" @click="dialogOption.visible = false">确 定</el-button>
+              <el-button @click="dialogConfig.visible = false">取 消</el-button>
+              <el-button type="primary" @click="dialogConfig.visible = false">确 定</el-button>
             </div>
           </el-dialog>
         </el-row>
@@ -167,35 +157,43 @@
           console.log(response)
         })
       },
-      getOrgUsers (params) {
-        let vm = this
-        this.$http.get(this.API_URL.USER.GET_ORG_USERS, {
-          params: params
-        }).then((response) => {
-            let data = response.data
-            vm.pageResult.list = data
-          }).catch(function (response) {
-            console.log(response)
-          })
-      },
       orgTreeConfig_handleNodeClick (data) {
         let vm = this
-        vm.getOrgUsers({
-            keyword: 1
+        vm.userQuery.organizationId = data.id
+        vm.dataGridConfig.pageNum = vm.dataGridConfig.pageNumInit
+        // 查询
+        vm.pageUsers()
+      },
+      pageUsers () {
+        let vm = this
+        vm.userQuery.pageNum = vm.dataGridConfig.pageNum
+        vm.userQuery.pageSize = vm.dataGridConfig.pageSize
+        this.$http.get(this.API_URL.USER.PAGE_USERS, {
+          params: vm.userQuery
+        }).then((response) => {
+          let res = response.data
+          if (res && res.ecode === '1000') {
+            vm.dataGridConfig.list = res.data.list
+            vm.dataGridConfig.total = res.data.total
+          }
+        }).catch(function (response) {
+          console.log(response)
         })
       },
-      handleSizeChange (data) {},
-      handleCurrentChange (data) {},
+      dataGrid_handleSizeChange (pageSize) {
+        let vm = this
+        vm.dataGridConfig.pageSize = pageSize
+        vm.pageUsers()
+      },
+      dataGrid_handleCurrentChange (currentPage) {
+        let vm = this
+        vm.pageUsers()
+      },
       handleIconClick (data) {}
     },
 
     data () {
       return {
-        tableData: [],
-        currentPage: 1,
-        searchParams: {
-            keyword: ''
-        },
         useStateOption: {
             value: '',
             options: [{
@@ -209,12 +207,7 @@
               label: '禁用'
             }]
         },
-        pageResult: {
-            total: 100,
-            list: [],
-            currentPage: 1
-        },
-        dialogOption: {
+        dialogConfig: {
             visible: false,
             title: '添加'
         },
@@ -237,6 +230,21 @@
           data: [],
           filterText: '',
           expandedKeys: [1]
+        },
+        userQuery: {
+          organizationId: null,
+          state: null,
+          keyword: null,
+          pageNum: 1,
+          pageSize: 10
+        },
+        dataGridConfig: {
+            total: 0,
+            list: [],
+            pageNum: 1,
+            pageNumInit: 1,
+            pageSize: 10,
+            pageSizes: [10, 20, 30, 40]
         }
       }
     }
