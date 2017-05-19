@@ -14,13 +14,10 @@
 </style>
 <template>
   <div>
-    <el-row>
+    <el-row :gutter="15">
       <el-col :span="5">
         <el-button type="primary" class="row-mt20 wd-persent100" icon="plus">添加</el-button>
-        <el-input
-          placeholder="组织名称"
-          v-model="orgTreeConfig.filterText">
-        </el-input>
+        <el-input placeholder="组织名称" v-model="orgTreeConfig.filterText"></el-input>
 
         <el-tree
           class="filter-tree"
@@ -39,7 +36,7 @@
         <!-- 搜索栏-->
         <el-row :gutter="10">
           <el-col :span="5">
-            <el-col :span="8">启用状态</el-col>
+            <el-col :span="8">账户状态</el-col>
             <el-col :span="16">
               <el-select v-model="userQuery.state" placeholder="请选择">
                 <el-option
@@ -51,13 +48,21 @@
               </el-select>
             </el-col>
           </el-col>
-          <el-col :span="5" class="col-ml10">
-            <el-input
-              placeholder="姓名/手机/邮箱"
-              icon="search"
-              v-model="userQuery.keyword"
-              :on-icon-click="handleIconClick">
-            </el-input>
+          <el-col :span="5">
+            <el-col :span="8">在职状态</el-col>
+            <el-col :span="16">
+              <el-select v-model="userQuery.state" placeholder="请选择">
+                <el-option
+                  v-for="item in useStateOption.options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-col>
+          </el-col>
+          <el-col :span="5">
+            <el-input placeholder="姓名/手机/邮箱" icon="search" v-model="userQuery.keyword" :on-icon-click="handleIconClick"></el-input>
           </el-col>
         </el-row>
         <!-- 操作栏-->
@@ -130,14 +135,12 @@
   export default {
     name: 'organization',
     mounted () {
-        let vm = this
       // orgTreeConfig
-      vm.orgTreeConfig_initData()
+      this.orgTreeConfig_initData()
     },
     watch: {
       'orgTreeConfig.filterText': {
         handler (newVal, oldVal) {
-            console.log(newVal)
           this.$refs.orgTree.filter(newVal)
         },
         deep: true
@@ -150,50 +153,47 @@
         return data.name.indexOf(value) !== -1
       },
       orgTreeConfig_initData () {
-        let vm = this
         this.$http.get(this.API_URL.ORGANIZATION.GET_ORG_TREE, {
         }).then((response) => {
           let res = response.data
           if (res && res.ecode === '1000') {
-            vm.orgTreeConfig.data = res.data
+            this.orgTreeConfig.data = res.data
           }
         }).catch(function (response) {
           console.log(response)
         })
       },
       orgTreeConfig_handleNodeClick (data) {
-        let vm = this
-        vm.userQuery.organizationId = data.id
-        vm.dataGridConfig.pageNum = vm.dataGridConfig.pageNumInit
+        this.userQuery.organizationId = data.id
+        this.dataGridConfig.pageNum = this.dataGridConfig.pageNumInit
         // 查询
-        vm.pageUsers()
+        this.pageUsers()
       },
       pageUsers () {
-        let vm = this
-        vm.userQuery.pageNum = vm.dataGridConfig.pageNum
-        vm.userQuery.pageSize = vm.dataGridConfig.pageSize
+        this.userQuery.pageNum = this.dataGridConfig.pageNum
+        this.userQuery.pageSize = this.dataGridConfig.pageSize
         this.$http.get(this.API_URL.USER.PAGE_USERS, {
-          params: vm.userQuery
+          params: this.userQuery
         }).then((response) => {
           let res = response.data
           if (res && res.ecode === '1000') {
-            vm.dataGridConfig.list = res.data.list
-            vm.dataGridConfig.total = res.data.total
+            this.dataGridConfig.list = res.data.list
+            this.dataGridConfig.total = res.data.total
           }
         }).catch(function (response) {
           console.log(response)
         })
       },
       dataGrid_handleSizeChange (pageSize) {
-        let vm = this
-        vm.dataGridConfig.pageSize = pageSize
-        vm.pageUsers()
+        this.dataGridConfig.pageSize = pageSize
+        this.pageUsers()
       },
       dataGrid_handleCurrentChange (currentPage) {
-        let vm = this
-        vm.pageUsers()
+        this.pageUsers()
       },
-      handleIconClick (data) {}
+      handleIconClick (e) {
+        this.pageUsers()
+      }
     },
 
     data () {
@@ -202,13 +202,13 @@
         useStateOption: {
             value: '',
             options: [{
-              value: '',
+              value: null,
               label: '全部'
             }, {
-              value: '1',
+              value: 1,
               label: '启用'
             }, {
-              value: '0',
+              value: 0,
               label: '禁用'
             }]
         },
