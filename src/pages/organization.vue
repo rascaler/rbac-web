@@ -1,4 +1,6 @@
-<style>
+<style rel="stylesheet/less" lang="less">
+  #organizaionContainer {
+  }
   .row-mt20{
     margin-top: 20px;
   }
@@ -11,13 +13,28 @@
   .wd-persent100{
     width: 100%;
   }
+  .el-form {
+    .el-input{width: 300px;}
+  }
+  .row-mtb15 {
+    .el-row {
+      margin-top: 15px;
+    }
+    & > .el-row:first-child {
+      margin-top: 0px;
+    }
+  }
 </style>
 <template>
-  <div>
+  <div id="organizaionContainer">
     <el-row :gutter="15">
-      <el-col :span="5">
-        <el-button type="primary" class="row-mt20 wd-persent100" icon="plus">添加</el-button>
-        <el-input placeholder="组织名称" v-model="orgTreeConfig.filterText"></el-input>
+      <el-col class="row-mtb15" :span="5">
+        <el-row>
+          <el-button type="primary" class="row-mt20 wd-persent100" icon="plus" @click="departmentDialogConfig.visible = true">添加</el-button>
+        </el-row>
+        <el-row>
+          <el-input placeholder="组织名称" v-model="orgTreeConfig.filterText"></el-input>
+        </el-row>
 
         <el-tree
           class="filter-tree"
@@ -32,7 +49,7 @@
           ref="orgTree">
         </el-tree>
       </el-col>
-      <el-col :span="19">
+      <el-col class="row-mtb15" :span="19">
         <!-- 搜索栏-->
         <el-row :gutter="10">
           <el-col :span="5">
@@ -126,6 +143,44 @@
           </el-dialog>
         </el-row>
 
+        <!-- 添加部门对话框-->
+        <el-row>
+          <el-dialog :title="departmentDialogConfig.title" :visible.sync="departmentDialogConfig.visible">
+            <el-tabs v-model="departmentTabConfig.activeName" type="border-card" @tab-click="handleClick">
+              <el-tab-pane label="部门信息" name="first">
+                <el-form :model="form">
+                  <el-form-item label="上级部门" :label-width="formLabelWidth">
+                    <el-select v-model="form.region" placeholder="请选择活动区域">
+                      <el-option label="区域一" value="shanghai"></el-option>
+                      <el-option label="区域二" value="beijing"></el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="部门名称" :label-width="formLabelWidth">
+                    <el-input v-model="form.name" auto-complete="off"></el-input>
+                  </el-form-item>
+                </el-form>
+              </el-tab-pane>
+              <el-tab-pane label="角色配置" name="second">
+                <el-form :model="form">
+                  <el-form-item label="上级部门" :label-width="formLabelWidth">
+                    <el-select v-model="form.region" placeholder="请选择活动区域">
+                      <el-option label="区域一" value="shanghai"></el-option>
+                      <el-option label="区域二" value="beijing"></el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="部门名称" :label-width="formLabelWidth">
+                    <el-input v-model="form.name" auto-complete="off"></el-input>
+                  </el-form-item>
+                </el-form>
+              </el-tab-pane>
+            </el-tabs>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="departmentDialogConfig.visible = false">取 消</el-button>
+              <el-button type="primary" @click="departmentDialogConfig.visible = false">确 定</el-button>
+            </div>
+          </el-dialog>
+        </el-row>
+
       </el-col>
     </el-row>
   </div>
@@ -193,12 +248,15 @@
       },
       handleIconClick (e) {
         this.pageUsers()
+      },
+      handleClick (tab, event) {
+        console.log(tab, event)
       }
     },
 
     data () {
       return {
-        filterText: '',
+        activeName2: 'first',
         useStateOption: {
             value: '',
             options: [{
@@ -216,6 +274,10 @@
             visible: false,
             title: '添加'
         },
+        departmentDialogConfig: {
+          visible: false,
+          title: '添加'
+        },
         form: {
           name: '',
           region: '',
@@ -226,7 +288,7 @@
           resource: '',
           desc: ''
         },
-        formLabelWidth: '120px',
+        formLabelWidth: '80px',
         orgTreeConfig: {
           defaultProps: {
             children: 'children',
@@ -250,6 +312,9 @@
             pageNumInit: 1,
             pageSize: 10,
             pageSizes: [10, 20, 30, 40]
+        },
+        departmentTabConfig: {
+            activeName: 'first'
         }
       }
     }
