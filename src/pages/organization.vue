@@ -1,28 +1,6 @@
 <style rel="stylesheet/less" lang="less">
+  @import "../styles/commons/common";
   #organizaionContainer {
-  }
-  .row-mt20{
-    margin-top: 20px;
-  }
-  .row-ml10{
-    margin-left: 10px;
-  }
-  .col-ml10{
-    margin-left: 10px;
-  }
-  .wd-persent100{
-    width: 100%;
-  }
-  .el-form {
-    .el-input{width: 300px;}
-  }
-  .row-mtb15 {
-    .el-row {
-      margin-top: 15px;
-    }
-    & > .el-row:first-child {
-      margin-top: 0px;
-    }
   }
 </style>
 <template>
@@ -30,7 +8,7 @@
     <el-row :gutter="15">
       <el-col class="row-mtb15" :span="5">
         <el-row>
-          <el-button type="primary" class="row-mt20 wd-persent100" icon="plus" @click="departmentDialogConfig.visible = true">添加</el-button>
+          <el-button type="primary" class="wd-persent100" icon="plus" @click="departmentDialogOpen">添加</el-button>
         </el-row>
         <el-row>
           <el-input placeholder="组织名称" v-model="orgTreeConfig.filterText"></el-input>
@@ -39,9 +17,10 @@
         <el-tree
           class="filter-tree"
           :data="orgTreeConfig.data"
-          :props="orgTreeConfig.defaultProps"
+          :props="orgTreeConfig.props"
           accordion
           highlight-current
+          :current-node-key="orgTreeConfig.currentKey"
           node-key="id"
           :default-expanded-keys = "orgTreeConfig.expandedKeys"
           :filter-node-method="orgTreeConfig_filterNode"
@@ -145,33 +124,28 @@
 
         <!-- 添加部门对话框-->
         <el-row>
-          <el-dialog :title="departmentDialogConfig.title" :visible.sync="departmentDialogConfig.visible">
+          <el-dialog :size="departmentDialogConfig.size" :title="departmentDialogConfig.title" :visible.sync="departmentDialogConfig.visible">
             <el-tabs v-model="departmentTabConfig.activeName" type="border-card" @tab-click="handleClick">
               <el-tab-pane label="部门信息" name="first">
-                <el-form :model="form">
-                  <el-form-item label="上级部门" :label-width="formLabelWidth">
-                    <el-select v-model="form.region" placeholder="请选择活动区域">
+                <el-form :model="departmentForm" ref="departmentForm">
+                  <el-form-item prop="parentName" label="上级部门" :label-width="formLabelWidth">
+                    <el-select v-model="departmentForm.parentName" placeholder="请选择父组织" disabled>
                       <el-option label="区域一" value="shanghai"></el-option>
                       <el-option label="区域二" value="beijing"></el-option>
                     </el-select>
                   </el-form-item>
-                  <el-form-item label="部门名称" :label-width="formLabelWidth">
-                    <el-input v-model="form.name" auto-complete="off"></el-input>
+                  <el-form-item prop="name" label="部门名称" :label-width="formLabelWidth">
+                    <el-input v-model="departmentForm.name" auto-complete="off"></el-input>
                   </el-form-item>
                 </el-form>
               </el-tab-pane>
               <el-tab-pane label="角色配置" name="second">
-                <el-form :model="form">
-                  <el-form-item label="上级部门" :label-width="formLabelWidth">
-                    <el-select v-model="form.region" placeholder="请选择活动区域">
-                      <el-option label="区域一" value="shanghai"></el-option>
-                      <el-option label="区域二" value="beijing"></el-option>
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item label="部门名称" :label-width="formLabelWidth">
-                    <el-input v-model="form.name" auto-complete="off"></el-input>
-                  </el-form-item>
-                </el-form>
+                <el-transfer
+                  v-model="roleTransferConfig.selectValue"
+                  :props="roleTransferConfig.props"
+                  :data="roleTransferConfig.data"
+                  :titles="roleTransferConfig.titles">
+                </el-transfer>
               </el-tab-pane>
             </el-tabs>
             <div slot="footer" class="dialog-footer">
@@ -187,6 +161,7 @@
 </template>
 
 <script>
+  import CONSTANT from '../commons/constant'
   export default {
     name: 'organization',
     mounted () {
@@ -196,23 +171,59 @@
     watch: {
       'orgTreeConfig.filterText': {
         handler (newVal, oldVal) {
-          this.$refs.orgTree.filter(newVal)
+          this.$refs['orgTree'].filter(newVal)
+        },
+        deep: true
+      },
+      'roleTransferConfig.selectValue': {
+        handler (newVal, oldVal) {
+          this.departmentForm.roleIds = newVal
         },
         deep: true
       }
     },
     methods: {
+      departmentDialogOpen (e) {
+        // 重置表单
+        if (this.$refs['departmentForm']) this.$refs['departmentForm'].resetFields()
+        this.roleTransferConfig.selectValue = []
+        // 重置选项卡
+        this.departmentTabConfig.activeName = 'first'
+        // 判断是否有选中组织，必须先选中父组织
+        this.departmentForm.parentId = this.orgTreeConfig.currentNodeData.id
+        this.departmentForm.parentName = this.orgTreeConfig.currentNodeData.name
+        // 查询所有角色
+        this.$http.get(CONSTANT.API_URL.ROLE.GET_ALL, {
+        }).then((response) => {
+          let res = response.data
+          if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+            // 写入结果
+            this.roleTransferConfig.data = res.data
+            // 打开模态框
+            this.departmentDialogConfig.visible = true
+          }
+        }).catch(function (response) {
+          console.log(response)
+        })
+      },
       // >>>>>>>>>>>>>>>>>>orgTreeConfig<<<<<<<<<<<<<<<<<<<<<<
       orgTreeConfig_filterNode (value, data) {
         if (!value) return true
         return data.name.indexOf(value) !== -1
       },
       orgTreeConfig_initData () {
-        this.$http.get(this.API_URL.ORGANIZATION.GET_ORG_TREE, {
+        this.$http.get(CONSTANT.API_URL.ORGANIZATION.GET_ORG_TREE, {
         }).then((response) => {
           let res = response.data
-          if (res && res.ecode === '1000') {
+          if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
             this.orgTreeConfig.data = res.data
+            // 加载后选中第一条，查询第一组织用户
+            if (res.data && res.data.length > 0) {
+              this.orgTreeConfig.currentKey = res.data[0].id
+              this.orgTreeConfig.currentNodeData = res.data[0]
+              this.userQuery.organizationId = res.data[0].id
+            }
+            this.pageUsers()
           }
         }).catch(function (response) {
           console.log(response)
@@ -220,6 +231,7 @@
       },
       orgTreeConfig_handleNodeClick (data) {
         this.userQuery.organizationId = data.id
+        this.orgTreeConfig.currentNodeData = data
         this.dataGridConfig.pageNum = this.dataGridConfig.pageNumInit
         // 查询
         this.pageUsers()
@@ -227,11 +239,11 @@
       pageUsers () {
         this.userQuery.pageNum = this.dataGridConfig.pageNum
         this.userQuery.pageSize = this.dataGridConfig.pageSize
-        this.$http.get(this.API_URL.USER.PAGE_USERS, {
+        this.$http.get(CONSTANT.API_URL.USER.PAGE_USERS, {
           params: this.userQuery
         }).then((response) => {
           let res = response.data
-          if (res && res.ecode === '1000') {
+          if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
             this.dataGridConfig.list = res.data.list
             this.dataGridConfig.total = res.data.total
           }
@@ -250,7 +262,8 @@
         this.pageUsers()
       },
       handleClick (tab, event) {
-        console.log(tab, event)
+//        console.log(tab, event)
+        console.log(this.roleTransferConfig.selectValue)
       }
     },
 
@@ -276,11 +289,16 @@
         },
         departmentDialogConfig: {
           visible: false,
-          title: '添加'
+          title: '添加',
+          style: {
+              width: '120px'
+
+          },
+          size: 'small'
         },
         form: {
           name: '',
-          region: '',
+          region: '1111',
           date1: '',
           date2: '',
           delivery: false,
@@ -288,15 +306,23 @@
           resource: '',
           desc: ''
         },
+        departmentForm: {
+          roleIds: [],
+          parentId: '',
+          name: '',
+          parentName: ''
+        },
         formLabelWidth: '80px',
         orgTreeConfig: {
-          defaultProps: {
+          props: {
             children: 'children',
             label: 'name'
           },
           data: [],
           filterText: '',
-          expandedKeys: [1]
+          expandedKeys: [1],
+          currentKey: '',
+          currentNodeData: null
         },
         userQuery: {
           organizationId: null,
@@ -315,6 +341,15 @@
         },
         departmentTabConfig: {
             activeName: 'first'
+        },
+        roleTransferConfig: {
+          props: {
+            key: 'id',
+            label: 'name'
+          },
+          data: [],
+          selectValue: [],
+          titles: ['可选角色', '已选角色']
         }
       }
     }

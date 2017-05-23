@@ -31,6 +31,20 @@
           <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
         </div>
       </el-dialog>
+
+
+      <el-form :model="numberValidateForm" ref="numberValidateForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item
+          label="年龄"
+          prop="age"
+        >
+          <el-input  v-model="numberValidateForm.age" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('numberValidateForm')">提交</el-button>
+          <el-button @click="resetForm('numberValidateForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
     </div>
 </template>
 <script>
@@ -66,7 +80,15 @@
           resource: '',
           desc: ''
         },
-        formLabelWidth: '120px'
+        formLabelWidth: '120px',
+        numberValidateForm: {
+          age: ''
+        }
+      }
+    },
+    methods: {
+      resetForm (formName) {
+        this.$refs[formName].resetFields()
       }
     }
   }

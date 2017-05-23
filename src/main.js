@@ -5,21 +5,26 @@ import App from './App'
 import router from './router'
 import VueResource from 'vue-resource'
 import ElementUI from 'element-ui'
+import ResponseCode from './commons/ResponseCode'
+import CONSTANT from './commons/constant'
 import 'element-ui/lib/theme-default/index.css'
 import './assets/images/logo.png'
 
 Vue.use(ElementUI)
 Vue.use(VueResource)
+
 // 分环境配置
 if (process.env.NODE_ENV === 'development') {
   let API_URL = require('./router/ApiUrl').default
   buildUrl('http://localhost:9090/', API_URL)
-  Vue.prototype.API_URL = API_URL
+  CONSTANT.API_URL = API_URL
 } else {
   let API_URL = require('./router/ApiUrl').default
   buildUrl('http://localhost:8888/', API_URL)
-  Vue.prototype.API_URL = API_URL
+  CONSTANT.API_URL = API_URL
 }
+CONSTANT.ResponseCode = ResponseCode
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
