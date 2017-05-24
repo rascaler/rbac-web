@@ -8,7 +8,6 @@ import ElementUI from 'element-ui'
 import ResponseCode from './commons/ResponseCode'
 import CONSTANT from './commons/constant'
 import 'element-ui/lib/theme-default/index.css'
-import './assets/images/logo.png'
 
 Vue.use(ElementUI)
 Vue.use(VueResource)
