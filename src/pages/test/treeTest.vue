@@ -9,6 +9,8 @@
       :expand-on-click-node="false"
       :render-content="renderContent">
     </el-tree>
+    <!-- <el-button size="mini" on-click={ () => this.append(store, data) }>Append</el-button> -->
+    <!-- <el-button size="mini" on-click={ () => this.remove(store, data) }>Delete</el-button> -->
   </div>
 </template>
 
@@ -75,12 +77,8 @@
             <span>
                <span class="el-tree-node__label">{node.label}</span>
             </span>
-            <span>
-              <span style="float:right">
-                <el-button size="mini" on-click={ () => this.append(store, data) }>Append</el-button>
-                <el-button size="mini" on-click={ () => this.remove(store, data) }>Delete</el-button>
-              </span>
-            </span>
+              <i class="el-icon-setting" style="line-height:36px;position:absolute;right:16px;">
+              </i>
         </span>)
       }
 //      renderContent: function (createElement, { node, data, store }) {
