@@ -26,6 +26,7 @@ if (process.env.NODE_ENV === 'development') {
 CONSTANT.ResponseCode = ResponseCode
 
 Vue.config.productionTip = false
+Vue.http.options.xhr = { withCredentials: true }
 
 /* eslint-disable no-new */
 new Vue({

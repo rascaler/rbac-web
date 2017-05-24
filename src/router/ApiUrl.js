@@ -4,7 +4,8 @@ const API_URL = {
     PAGE_USERS: 'user/pageUsers'
   },
   ORGANIZATION: {
-    GET_ORG_TREE: 'organization/getOrgTree'
+    GET_ORG_TREE: 'organization/getOrgTree',
+    SAVE_OR_UPDATE: 'organization/saveOrUpdate'
   },
   ROLE: {
     GET_ALL: 'role/getAll'

@@ -25,7 +25,9 @@
           :default-expanded-keys = "orgTreeConfig.expandedKeys"
           :filter-node-method="orgTreeConfig_filterNode"
           @node-click="orgTreeConfig_handleNodeClick"
-          ref="orgTree">
+          ref="orgTree"
+          :expand-on-click-node="false"
+          :render-content="orgTreeConfig_renderContent">
         </el-tree>
       </el-col>
       <el-col class="row-mtb15" :span="19">
@@ -125,17 +127,17 @@
         <!-- 添加部门对话框-->
         <el-row>
           <el-dialog :size="departmentDialogConfig.size" :title="departmentDialogConfig.title" :visible.sync="departmentDialogConfig.visible">
-            <el-tabs v-model="departmentTabConfig.activeName" type="border-card" @tab-click="handleClick">
+            <el-tabs v-model="organizationTabConfig.activeName" type="border-card" @tab-click="handleClick">
               <el-tab-pane label="部门信息" name="first">
-                <el-form :model="departmentForm" ref="departmentForm">
+                <el-form :model="organizationForm" ref="organizationForm">
                   <el-form-item prop="parentName" label="上级部门" :label-width="formLabelWidth">
-                    <el-select v-model="departmentForm.parentName" placeholder="请选择父组织" disabled>
+                    <el-select v-model="organizationForm.parentName" placeholder="请选择父组织" disabled>
                       <el-option label="区域一" value="shanghai"></el-option>
                       <el-option label="区域二" value="beijing"></el-option>
                     </el-select>
                   </el-form-item>
                   <el-form-item prop="name" label="部门名称" :label-width="formLabelWidth">
-                    <el-input v-model="departmentForm.name" auto-complete="off"></el-input>
+                    <el-input v-model="organizationForm.name" auto-complete="off"></el-input>
                   </el-form-item>
                 </el-form>
               </el-tab-pane>
@@ -150,7 +152,7 @@
             </el-tabs>
             <div slot="footer" class="dialog-footer">
               <el-button @click="departmentDialogConfig.visible = false">取 消</el-button>
-              <el-button type="primary" @click="departmentDialogConfig.visible = false">确 定</el-button>
+              <el-button type="primary" @click="saveOrganization">确 定</el-button>
             </div>
           </el-dialog>
         </el-row>
@@ -177,7 +179,7 @@
       },
       'roleTransferConfig.selectValue': {
         handler (newVal, oldVal) {
-          this.departmentForm.roleIds = newVal
+          this.organizationForm.roleIds = newVal
         },
         deep: true
       }
@@ -185,13 +187,13 @@
     methods: {
       departmentDialogOpen (e) {
         // 重置表单
-        if (this.$refs['departmentForm']) this.$refs['departmentForm'].resetFields()
+        if (this.$refs['organizationForm']) this.$refs['organizationForm'].resetFields()
         this.roleTransferConfig.selectValue = []
         // 重置选项卡
-        this.departmentTabConfig.activeName = 'first'
+        this.organizationTabConfig.activeName = 'first'
         // 判断是否有选中组织，必须先选中父组织
-        this.departmentForm.parentId = this.orgTreeConfig.currentNodeData.id
-        this.departmentForm.parentName = this.orgTreeConfig.currentNodeData.name
+        this.organizationForm.parentId = this.orgTreeConfig.currentNodeData.id
+        this.organizationForm.parentName = this.orgTreeConfig.currentNodeData.name
         // 查询所有角色
         this.$http.get(CONSTANT.API_URL.ROLE.GET_ALL, {
         }).then((response) => {
@@ -236,6 +238,11 @@
         // 查询
         this.pageUsers()
       },
+      orgTreeConfig_renderContent (h, { node }) {
+          let el = document.createElement('span')
+        el.innerText = 111
+        return el
+      },
       pageUsers () {
         this.userQuery.pageNum = this.dataGridConfig.pageNum
         this.userQuery.pageSize = this.dataGridConfig.pageSize
@@ -264,6 +271,19 @@
       handleClick (tab, event) {
 //        console.log(tab, event)
         console.log(this.roleTransferConfig.selectValue)
+      },
+      saveOrganization () {
+        this.$http.post(CONSTANT.API_URL.ORGANIZATION.SAVE_OR_UPDATE, JSON.stringify(this.organizationForm))
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              this.$message.success(res.msg)
+            } else {
+              this.$message.error(res.msg)
+            }
+        }).catch(function (response) {
+          console.log(response)
+        })
       }
     },
 
@@ -306,7 +326,7 @@
           resource: '',
           desc: ''
         },
-        departmentForm: {
+        organizationForm: {
           roleIds: [],
           parentId: '',
           name: '',
@@ -339,7 +359,7 @@
             pageSize: 10,
             pageSizes: [10, 20, 30, 40]
         },
-        departmentTabConfig: {
+        organizationTabConfig: {
             activeName: 'first'
         },
         roleTransferConfig: {

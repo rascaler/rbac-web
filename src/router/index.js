@@ -4,6 +4,7 @@ import Hello from '@/pages/Hello'
 import example from '@/pages/example'
 import organization from '@/pages/organization'
 import test from '@/pages/test'
+import treeTest from '@/pages/test/treeTest'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/test',
       name: 'test',
       component: test
+    },
+    {
+      path: '/treeTest',
+      name: 'treeTest',
+      component: treeTest
     }
   ]
 })
