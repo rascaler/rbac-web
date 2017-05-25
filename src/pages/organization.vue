@@ -1,6 +1,10 @@
 <style rel="stylesheet/less" lang="less">
   @import "../styles/commons/common";
   #organizaionContainer {
+    .el-tree-node__content {white-space: normal;position: relative;}
+    .show {display: block;}
+    .hide {display: none;}
+    .el-tree-node__children {overflow: inherit !important;}
   }
 </style>
 <template>
@@ -238,10 +242,24 @@
         // 查询
         this.pageUsers()
       },
-      orgTreeConfig_renderContent (h, { node }) {
-          let el = document.createElement('span')
-        el.innerText = 111
-        return el
+      orgTreeConfig_renderContent (h, { node, data, store }) {
+        return (
+          <span>
+            <span>
+              <span>{data.name}</span>
+            </span>
+            <span class="el-tree-node__label" style="right: 0px; margin-right: 5px;position:absolute;" >
+              <i class="el-icon-setting" on-click={ (e) => { this.orgTreeConfig.nodeId = data.id } }></i>
+              <ul class={'el-dropdown-menu ' + (this.orgTreeConfig.nodeId === data.id ? 'show' : 'hide')} style="left:20px;top:-6px;width:120px;" on-mouseleave={ () => { this.orgTreeConfig.nodeId = null } }>
+                <li class="el-dropdown-menu__item node" on-click={ (e) => console.log(data.id) }>
+                  <i class="el-icon-plus"></i> &nbsp;添加子组织</li>
+                <li class="el-dropdown-menu__item" on-click={ (e) => console.log(data.id) }><i class="el-icon-edit"></i> &nbsp;修改</li>
+                <li class="el-dropdown-menu__item" on-click={ (e) => console.log(data.id) }><i class="el-icon-delete"></i> &nbsp;删除</li>
+                <li class="el-dropdown-menu__item el-dropdown-menu__item--divided is-disabled is-divided">&nbsp;ID: {data.id}</li>
+              </ul>
+            </span>
+          </span>
+        )
       },
       pageUsers () {
         this.userQuery.pageNum = this.dataGridConfig.pageNum
@@ -342,7 +360,8 @@
           filterText: '',
           expandedKeys: [1],
           currentKey: '',
-          currentNodeData: null
+          currentNodeData: null,
+          nodeId: null
         },
         userQuery: {
           organizationId: null,
