@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-tree
+    <el-tree style="width: 500px;" id="aa"
       :data="data2"
       :props="defaultProps"
       show-checkbox
@@ -14,7 +14,12 @@
   </div>
 </template>
 
-
+<style>
+  .el-tree-node__content {white-space: normal;position: relative;}
+  .show {display: block;}
+  .hide {display: none;}
+  .el-tree-node__children {overflow: inherit !important;}
+</style>
 <script>
   let id = 1000
 
@@ -59,7 +64,9 @@
         defaultProps: {
           children: 'children',
           label: 'label'
-        }
+        },
+        menuState: 'hide',
+        nodeId: null
       }
     },
 
@@ -73,13 +80,22 @@
       },
       renderContent (h, { node, data, store }) {
         return (
+        <span>
           <span>
-            <span>
-               <span class="el-tree-node__label">{node.label}</span>
-            </span>
-              <i class="el-icon-setting" style="line-height:36px;position:absolute;right:16px;">
-              </i>
-        </span>)
+            <span>{node.label}</span>
+          </span>
+          <span class="el-tree-node__label" style="right: 0px; margin-right: 5px;position:absolute;" >
+            <i class="el-icon-setting" on-click={ (e) => { this.nodeId = node.id } }></i>
+              <ul class={'el-dropdown-menu ' + (this.nodeId === node.id ? 'show' : 'hide')} style="left:20px;top:-6px;width:120px;" on-mouseleave={ () => { this.nodeId = null } }>
+                <li class="el-dropdown-menu__item node" on-click={ (e) => console.log(node.id) }>
+                <i class="el-icon-plus"></i> &nbsp;添加子组织</li>
+                <li class="el-dropdown-menu__item" on-click={ (e) => console.log(node.id) }><i class="el-icon-edit"></i> &nbsp;修改</li>
+                <li class="el-dropdown-menu__item" on-click={ (e) => console.log(node.id) }><i class="el-icon-delete"></i> &nbsp;删除</li>
+                <li class="el-dropdown-menu__item el-dropdown-menu__item--divided is-disabled is-divided">&nbsp;ID: {node.id}</li>
+              </ul>
+          </span>
+        </span>
+      )
       }
 //      renderContent: function (createElement, { node, data, store }) {
 //        return createElement('span', [
