@@ -9,13 +9,11 @@
       :expand-on-click-node="false"
       :render-content="renderContent">
     </el-tree>
-    <!-- <el-button size="mini" on-click={ () => this.append(store, data) }>Append</el-button> -->
-    <!-- <el-button size="mini" on-click={ () => this.remove(store, data) }>Delete</el-button> -->
   </div>
 </template>
 
 <style>
-  .el-tree-node__content {white-space: normal;position: relative;}
+  .el-tree-node__content {white-space: normal;position: relative;z-index: 1;background: #fff}
   .show {display: block;}
   .hide {display: none;}
   .el-tree-node__children {overflow: inherit !important;}
