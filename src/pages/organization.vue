@@ -22,7 +22,6 @@
             <el-tree id="orgTree"
                      :data="orgTreeConfig.data"
                      :props="orgTreeConfig.props"
-                     accordion
                      highlight-current
                      :current-node-key="orgTreeConfig.currentKey"
                      node-key="id"
