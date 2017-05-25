@@ -2,7 +2,7 @@
   @import "../styles/commons/common";
   #organizaionContainer {
     #orgTree {
-      .el-tree-node__content {white-space: normal;position: relative;z-index: 1;background: #fff}
+      .el-tree-node__content {white-space: normal;position: relative;z-index: 1;background: #fff!important;}
       .show {display: block;}
       .hide {display: none;}
       .el-tree-node__children {overflow: inherit !important;}
@@ -23,7 +23,6 @@
         </el-row>
 
         <el-tree id="orgTree"
-          class="filter-tree"
           :data="orgTreeConfig.data"
           :props="orgTreeConfig.props"
           accordion
