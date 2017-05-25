@@ -31,7 +31,7 @@
           <el-menu-item index="3"><i class="el-icon-setting"></i>导航三</el-menu-item>
         </el-menu>
       </el-col>
-      <el-col :span="19">
+      <el-col :span="19" style="border: 1px solid #dfe6ec;">
         <div style="margin: 15px;">
           <router-view></router-view>
         </div>
@@ -44,7 +44,7 @@
     created: function () {
     },
     computed: {
-      contentStyle: function () {
+      contentStyle () {
         let height = (this.totalHeight - 67) + 'px'
         return {'height': height}
       }

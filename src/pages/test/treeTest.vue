@@ -1,22 +1,25 @@
 <template>
   <div>
-    <el-tree style="width: 500px;" id="aa"
-      :data="data2"
-      :props="defaultProps"
-      show-checkbox
-      node-key="id"
-      default-expand-all
-      :expand-on-click-node="false"
-      :render-content="renderContent">
-    </el-tree>
+    <div style="width: 500px;position: relative;">
+      <el-tree id="aa"
+               :data="data2"
+               :props="defaultProps"
+               show-checkbox
+               node-key="id"
+               default-expand-all
+               :expand-on-click-node="false"
+               :render-content="renderContent">
+      </el-tree>
+    </div>
+
   </div>
 </template>
 
 <style>
-  .el-tree-node__content {white-space: normal;position: relative;z-index: 1;background: #fff}
+  /*.el-tree-node__content {z-index: 1;background: #fff}*/
   .show {display: block;}
   .hide {display: none;}
-  .el-tree-node__children {overflow: inherit !important;}
+  /*.el-tree-node__children {overflow: inherit !important;}*/
 </style>
 <script>
   let id = 1000

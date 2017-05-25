@@ -2,11 +2,10 @@
   @import "../styles/commons/common";
   #organizaionContainer {
     #orgTree {
-      .el-tree-node__content {white-space: normal;position: relative;z-index: 1;background: #fff!important;}
       .show {display: block;}
       .hide {display: none;}
-      .el-tree-node__children {overflow: inherit !important;}
       .tree-operator-container {right: 0px; margin-right: 5px;position:absolute;}
+      .tree-container {position: absolute;width: 100%;}
       .el-dropdown-menu {left:20px;top:-6px;width:120px;}
     }
   }
@@ -16,26 +15,26 @@
     <el-row :gutter="15">
       <el-col class="row-mtb15" :span="5">
         <el-row>
-          <el-button type="primary" class="wd-persent100" icon="plus" @click="departmentDialogOpen">添加</el-button>
-        </el-row>
-        <el-row>
           <el-input placeholder="组织名称" v-model="orgTreeConfig.filterText"></el-input>
         </el-row>
-
-        <el-tree id="orgTree"
-          :data="orgTreeConfig.data"
-          :props="orgTreeConfig.props"
-          accordion
-          highlight-current
-          :current-node-key="orgTreeConfig.currentKey"
-          node-key="id"
-          :default-expanded-keys = "orgTreeConfig.expandedKeys"
-          :filter-node-method="orgTreeConfig_filterNode"
-          @node-click="orgTreeConfig_handleNodeClick"
-          ref="orgTree"
-          :expand-on-click-node="false"
-          :render-content="orgTreeConfig_renderContent">
-        </el-tree>
+        <el-row>
+          <div class="tree-container">
+            <el-tree id="orgTree"
+                     :data="orgTreeConfig.data"
+                     :props="orgTreeConfig.props"
+                     accordion
+                     highlight-current
+                     :current-node-key="orgTreeConfig.currentKey"
+                     node-key="id"
+                     :default-expanded-keys = "orgTreeConfig.expandedKeys"
+                     :filter-node-method="orgTreeConfig_filterNode"
+                     @node-click="orgTreeConfig_handleNodeClick"
+                     ref="orgTree"
+                     :expand-on-click-node="false"
+                     :render-content="orgTreeConfig_renderContent">
+            </el-tree>
+          </div>
+        </el-row>
       </el-col>
       <el-col class="row-mtb15" :span="19">
         <!-- 搜索栏-->
@@ -166,6 +165,7 @@
 
       </el-col>
     </el-row>
+
   </div>
 </template>
 
@@ -192,15 +192,15 @@
       }
     },
     methods: {
-      departmentDialogOpen (e) {
+      organizationDialogOpen (e, data) {
         // 重置表单
         if (this.$refs['organizationForm']) this.$refs['organizationForm'].resetFields()
         this.roleTransferConfig.selectValue = []
         // 重置选项卡
         this.organizationTabConfig.activeName = 'first'
         // 判断是否有选中组织，必须先选中父组织
-        this.organizationForm.parentId = this.orgTreeConfig.currentNodeData.id
-        this.organizationForm.parentName = this.orgTreeConfig.currentNodeData.name
+        this.organizationForm.parentId = data.id
+        this.organizationForm.parentName = data.name
         // 查询所有角色
         this.$http.get(CONSTANT.API_URL.ROLE.GET_ALL, {
         }).then((response) => {
@@ -252,7 +252,7 @@
             <span class="el-tree-node__label tree-operator-container">
               <i class="el-icon-setting" on-click={ (e) => { this.orgTreeConfig.nodeId = data.id } }></i>
               <ul class={'el-dropdown-menu ' + (this.orgTreeConfig.nodeId === data.id ? 'show' : 'hide')} on-mouseleave={ () => { this.orgTreeConfig.nodeId = null } }>
-                <li class="el-dropdown-menu__item node" on-click={ (e) => console.log(data.id) }>
+                <li class="el-dropdown-menu__item node" on-click={ (e) => this.organizationDialogOpen(e, data) }>
                   <i class="el-icon-plus"></i> &nbsp;添加子组织</li>
                 <li class="el-dropdown-menu__item" on-click={ (e) => console.log(data.id) }><i class="el-icon-edit"></i> &nbsp;修改</li>
                 <li class="el-dropdown-menu__item" on-click={ (e) => console.log(data.id) }><i class="el-icon-delete"></i> &nbsp;删除</li>
