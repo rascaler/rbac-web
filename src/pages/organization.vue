@@ -1,10 +1,14 @@
 <style rel="stylesheet/less" lang="less">
   @import "../styles/commons/common";
   #organizaionContainer {
-    .el-tree-node__content {white-space: normal;position: relative;}
-    .show {display: block;}
-    .hide {display: none;}
-    .el-tree-node__children {overflow: inherit !important;}
+    #orgTree {
+      .el-tree-node__content {white-space: normal;position: relative;}
+      .show {display: block;}
+      .hide {display: none;}
+      .el-tree-node__children {overflow: inherit !important;}
+      .tree-operator-container {right: 0px; margin-right: 5px;position:absolute;}
+      .el-dropdown-menu {left:20px;top:-6px;width:120px;}
+    }
   }
 </style>
 <template>
@@ -18,7 +22,7 @@
           <el-input placeholder="组织名称" v-model="orgTreeConfig.filterText"></el-input>
         </el-row>
 
-        <el-tree
+        <el-tree id="orgTree"
           class="filter-tree"
           :data="orgTreeConfig.data"
           :props="orgTreeConfig.props"
@@ -245,12 +249,10 @@
       orgTreeConfig_renderContent (h, { node, data, store }) {
         return (
           <span>
-            <span>
-              <span>{data.name}</span>
-            </span>
-            <span class="el-tree-node__label" style="right: 0px; margin-right: 5px;position:absolute;" >
+            <span>{data.name}</span>
+            <span class="el-tree-node__label tree-operator-container">
               <i class="el-icon-setting" on-click={ (e) => { this.orgTreeConfig.nodeId = data.id } }></i>
-              <ul class={'el-dropdown-menu ' + (this.orgTreeConfig.nodeId === data.id ? 'show' : 'hide')} style="left:20px;top:-6px;width:120px;" on-mouseleave={ () => { this.orgTreeConfig.nodeId = null } }>
+              <ul class={'el-dropdown-menu ' + (this.orgTreeConfig.nodeId === data.id ? 'show' : 'hide')} on-mouseleave={ () => { this.orgTreeConfig.nodeId = null } }>
                 <li class="el-dropdown-menu__item node" on-click={ (e) => console.log(data.id) }>
                   <i class="el-icon-plus"></i> &nbsp;添加子组织</li>
                 <li class="el-dropdown-menu__item" on-click={ (e) => console.log(data.id) }><i class="el-icon-edit"></i> &nbsp;修改</li>
