@@ -135,28 +135,32 @@
           <el-dialog :size="organizationDialogConfig.size" :title="organizationDialogConfig.title" :visible.sync="organizationDialogConfig.visible">
             <el-tabs v-model="organizationTabConfig.activeName" type="border-card" @tab-click="handleClick">
               <el-tab-pane label="部门信息" name="first">
-                <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWith">
-                  <el-form-item prop="parentName" label="上级部门">
-                    <el-select v-model="organizationFormConfig.data.parentName" placeholder="请选择父组织" disabled>
-                      <el-option label="区域一" value="shanghai"></el-option>
-                      <el-option label="区域二" value="beijing"></el-option>
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item prop="name" label="部门名称">
-                    <el-input v-model="organizationFormConfig.data.name" auto-complete="off"></el-input>
-                  </el-form-item>
-                  <el-form-item label="描述">
-                    <el-input type="textarea" v-model="organizationFormConfig.data.description"></el-input>
-                  </el-form-item>
-                </el-form>
+                <el-row>
+                  <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWith">
+                    <el-form-item prop="parentName" label="上级部门">
+                      <el-select v-model="organizationFormConfig.data.parentName" placeholder="请选择父组织" disabled>
+                        <el-option label="区域一" value="shanghai"></el-option>
+                        <el-option label="区域二" value="beijing"></el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item prop="name" label="部门名称">
+                      <el-input v-model="organizationFormConfig.data.name" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="描述">
+                      <el-input type="textarea" v-model="organizationFormConfig.data.description"></el-input>
+                    </el-form-item>
+                  </el-form>
+                </el-row>
               </el-tab-pane>
               <el-tab-pane label="角色配置" name="second">
-                <el-transfer
-                  v-model="roleTransferConfig.selectValue"
-                  :props="roleTransferConfig.props"
-                  :data="roleTransferConfig.data"
-                  :titles="roleTransferConfig.titles">
-                </el-transfer>
+                <el-row type="flex" justify="center">
+                  <el-transfer
+                               v-model="roleTransferConfig.selectValue"
+                               :props="roleTransferConfig.props"
+                               :data="roleTransferConfig.data"
+                               :titles="roleTransferConfig.titles">
+                  </el-transfer>
+                </el-row>
               </el-tab-pane>
             </el-tabs>
             <div slot="footer" class="dialog-footer">
@@ -341,7 +345,30 @@
         })
       },
       getOrganizationDetail (e, data) {
-        this.organizationDialogConfig.title = '修改'
+        this.$http.get(CONSTANT.API_URL.ORGANIZATION.DETAIL, {
+            params: {
+                id: data.id
+            }
+        }).then((response) => {
+          let res = response.data
+          if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+            let formData = this.organizationFormConfig.data
+            // 写入结果
+            formData.roleIds = res.data.roleIds
+            console.log(res.data.roleIds)
+            this.roleTransferConfig.selectValue = res.data.roleIds ? res.data.roleIds : []
+            formData.description = res.data.description
+            formData.id = res.data.id
+            formData.name = res.data.name
+//            formData.parentId = res.data.parentId
+//            formData.parentName
+            // 打开模态框
+            this.organizationDialogConfig.visible = true
+            this.organizationDialogConfig.title = '修改'
+          }
+        }).catch(function (response) {
+          console.log(response)
+        })
         // 先查询详情
         this.organizationDialogOpen(e, data)
       }

@@ -6,7 +6,8 @@ const API_URL = {
   ORGANIZATION: {
     GET_ORG_TREE: 'organization/getOrgTree',
     SAVE_OR_UPDATE: 'organization/saveOrUpdate',
-    REMOVE: 'organization/remove'
+    REMOVE: 'organization/remove',
+    DETAIL: 'organization/detail'
   },
   ROLE: {
     GET_ALL: 'role/getAll'
