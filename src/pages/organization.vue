@@ -8,6 +8,7 @@
       .tree-container {position: absolute;width: 100%;}
       .el-dropdown-menu {left:20px;top:-6px;width:120px;}
     }
+    .el-form { width: 400px;}
   }
 </style>
 <template>
@@ -129,20 +130,23 @@
           </el-dialog>
         </el-row>
 
-        <!-- 添加部门对话框-->
+        <!-- 添加组织对话框-->
         <el-row>
-          <el-dialog :size="departmentDialogConfig.size" :title="departmentDialogConfig.title" :visible.sync="departmentDialogConfig.visible">
+          <el-dialog :size="organizationDialogConfig.size" :title="organizationDialogConfig.title" :visible.sync="organizationDialogConfig.visible">
             <el-tabs v-model="organizationTabConfig.activeName" type="border-card" @tab-click="handleClick">
               <el-tab-pane label="部门信息" name="first">
-                <el-form :model="organizationForm" ref="organizationForm">
-                  <el-form-item prop="parentName" label="上级部门" :label-width="formLabelWidth">
-                    <el-select v-model="organizationForm.parentName" placeholder="请选择父组织" disabled>
+                <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWith">
+                  <el-form-item prop="parentName" label="上级部门">
+                    <el-select v-model="organizationFormConfig.data.parentName" placeholder="请选择父组织" disabled>
                       <el-option label="区域一" value="shanghai"></el-option>
                       <el-option label="区域二" value="beijing"></el-option>
                     </el-select>
                   </el-form-item>
-                  <el-form-item prop="name" label="部门名称" :label-width="formLabelWidth">
-                    <el-input v-model="organizationForm.name" auto-complete="off"></el-input>
+                  <el-form-item prop="name" label="部门名称">
+                    <el-input v-model="organizationFormConfig.data.name" auto-complete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="描述">
+                    <el-input type="textarea" v-model="organizationFormConfig.data.description"></el-input>
                   </el-form-item>
                 </el-form>
               </el-tab-pane>
@@ -156,7 +160,7 @@
               </el-tab-pane>
             </el-tabs>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="departmentDialogConfig.visible = false">取 消</el-button>
+              <el-button @click="organizationDialogConfig.visible = false">取 消</el-button>
               <el-button type="primary" @click="saveOrganization">确 定</el-button>
             </div>
           </el-dialog>
@@ -185,7 +189,7 @@
       },
       'roleTransferConfig.selectValue': {
         handler (newVal, oldVal) {
-          this.organizationForm.roleIds = newVal
+          this.organizationFormConfig.data.roleIds = newVal
         },
         deep: true
       }
@@ -193,13 +197,13 @@
     methods: {
       organizationDialogOpen (e, data) {
         // 重置表单
-        if (this.$refs['organizationForm']) this.$refs['organizationForm'].resetFields()
+        if (this.$refs['organizationFormConfig']) this.$refs['organizationFormConfig'].resetFields()
         this.roleTransferConfig.selectValue = []
         // 重置选项卡
         this.organizationTabConfig.activeName = 'first'
         // 判断是否有选中组织，必须先选中父组织
-        this.organizationForm.parentId = data.id
-        this.organizationForm.parentName = data.name
+        this.organizationFormConfig.data.parentId = data.id
+        this.organizationFormConfig.data.parentName = data.name
         // 查询所有角色
         this.$http.get(CONSTANT.API_URL.ROLE.GET_ALL, {
         }).then((response) => {
@@ -208,7 +212,7 @@
             // 写入结果
             this.roleTransferConfig.data = res.data
             // 打开模态框
-            this.departmentDialogConfig.visible = true
+            this.organizationDialogConfig.visible = true
           }
         }).catch(function (response) {
           console.log(response)
@@ -219,7 +223,7 @@
         if (!value) return true
         return data.name.indexOf(value) !== -1
       },
-      orgTreeConfig_initData () {
+      orgTreeConfig_initData (currentData) {
         this.$http.get(CONSTANT.API_URL.ORGANIZATION.GET_ORG_TREE, {
         }).then((response) => {
           let res = response.data
@@ -227,9 +231,10 @@
             this.orgTreeConfig.data = res.data
             // 加载后选中第一条，查询第一组织用户
             if (res.data && res.data.length > 0) {
-              this.orgTreeConfig.currentKey = res.data[0].id
-              this.orgTreeConfig.currentNodeData = res.data[0]
-              this.userQuery.organizationId = res.data[0].id
+              this.orgTreeConfig.currentKey = currentData ? currentData.id : res.data[0].id
+              this.orgTreeConfig.currentNodeData = currentData ? currentData : res.data[0]
+              this.orgTreeConfig.expandedKeys = [].push(currentData ? currentData.id : res.data[0].id)
+              this.userQuery.organizationId = currentData ? currentData.id : res.data[0].id
             }
             this.pageUsers()
           }
@@ -244,18 +249,22 @@
         // 查询
         this.pageUsers()
       },
+      orgTreeConfig_operatorShow (e, data) {
+        e.stopPropagation()
+        this.orgTreeConfig.nodeId = data.id
+      },
       orgTreeConfig_renderContent (h, { node, data, store }) {
         return (
           <span>
             <span>{data.name}</span>
             <span class="el-tree-node__label tree-operator-container">
-              <i class="el-icon-setting" on-click={ (e) => { this.orgTreeConfig.nodeId = data.id } }></i>
-              <ul class={'el-dropdown-menu ' + (this.orgTreeConfig.nodeId === data.id ? 'show' : 'hide')} on-mouseleave={ () => { this.orgTreeConfig.nodeId = null } }>
+              <i class="el-icon-setting" on-click={ (e) => this.orgTreeConfig_operatorShow(e, data) }></i>
+              <ul class={'el-dropdown-menu ' + (this.orgTreeConfig.nodeId === data.id ? 'show' : 'hide')} on-click={ (e) => e.stopPropagation() } on-mouseleave={ () => { this.orgTreeConfig.nodeId = null } }>
                 <li class="el-dropdown-menu__item node" on-click={ (e) => this.organizationDialogOpen(e, data) }>
                   <i class="el-icon-plus"></i> &nbsp;添加子组织</li>
-                <li class="el-dropdown-menu__item" on-click={ (e) => console.log(data.id) }><i class="el-icon-edit"></i> &nbsp;修改</li>
-                <li class="el-dropdown-menu__item" on-click={ (e) => console.log(data.id) }><i class="el-icon-delete"></i> &nbsp;删除</li>
-                <li class="el-dropdown-menu__item el-dropdown-menu__item--divided is-disabled is-divided">&nbsp;ID: {data.id}</li>
+                <li class="el-dropdown-menu__item" on-click={ (e) => this.getOrganizationDetail(e, data) }><i class="el-icon-edit"></i> &nbsp;修改</li>
+                <li class="el-dropdown-menu__item" on-click={ (e) => this.removeOrganziaton(e, store, data) }><i class="el-icon-delete"></i> &nbsp;删除</li>
+                <li class="el-dropdown-menu__item el-dropdown-menu__item--divided is-disabled is-divided" >&nbsp;ID: {data.id}</li>
               </ul>
             </span>
           </span>
@@ -290,18 +299,42 @@
 //        console.log(tab, event)
         console.log(this.roleTransferConfig.selectValue)
       },
-      saveOrganization () {
-        this.$http.post(CONSTANT.API_URL.ORGANIZATION.SAVE_OR_UPDATE, JSON.stringify(this.organizationForm))
+      saveOrganization (e, store, data) {
+        this.$http.post(CONSTANT.API_URL.ORGANIZATION.SAVE_OR_UPDATE, JSON.stringify(this.organizationFormConfig.data))
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
               this.$message.success(res.msg)
+              // 刷新组织树，并选中新添加的节点
+              this.orgTreeConfig_initData(res.data)
             } else {
               this.$message.error(res.msg)
             }
         }).catch(function (response) {
           console.log(response)
         })
+      },
+      removeOrganziaton (e, store, data) {
+        this.$http.post(CONSTANT.API_URL.ORGANIZATION.REMOVE, {id: data.id}, {
+          emulateJSON: true
+        }).then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              this.$message.success(res.msg)
+              // 刷新组织树，并选中被删除的组织的父节点
+              this.orgTreeConfig_initData()
+            } else {
+              this.$message.error(res.msg)
+            }
+          }).catch(function (response) {
+          let res = response.data
+          if (res) this.$message.error(res.msg)
+        })
+      },
+      getOrganizationDetail (e, data) {
+        this.organizationDialogConfig.title = '修改'
+        // 先查询详情
+        this.organizationDialogOpen(e, data)
       }
     },
 
@@ -325,7 +358,7 @@
             visible: false,
             title: '添加'
         },
-        departmentDialogConfig: {
+        organizationDialogConfig: {
           visible: false,
           title: '添加',
           style: {
@@ -344,11 +377,18 @@
           resource: '',
           desc: ''
         },
-        organizationForm: {
-          roleIds: [],
-          parentId: '',
-          name: '',
-          parentName: ''
+        organizationFormConfig: {
+          data: {
+            roleIds: [],
+            parentId: '',
+            name: '',
+            parentName: '',
+            id: '',
+            description: ''
+          },
+          style: {
+              labelWith: '80px'
+          }
         },
         formLabelWidth: '80px',
         orgTreeConfig: {
@@ -358,7 +398,7 @@
           },
           data: [],
           filterText: '',
-          expandedKeys: [1],
+          expandedKeys: [],
           currentKey: '',
           currentNodeData: null,
           nodeId: null
