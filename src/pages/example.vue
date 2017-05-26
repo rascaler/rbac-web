@@ -12,13 +12,13 @@
       }
     },
     created: function () {
-      this.$http.get(this.CONSTANT.EXAMPLE)
-        .then((response) => {
-          this.$set('gridData', response.data)
-        })
-        .catch(function (response) {
-          console.log(response)
-        })
+//      this.$http.get(this.CONSTANT.EXAMPLE)
+//        .then((response) => {
+//          this.$set('gridData', response.data)
+//        })
+//        .catch(function (response) {
+//          console.log(response)
+//        })
     },
     mounted: function () {
     },

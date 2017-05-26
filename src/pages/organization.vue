@@ -231,10 +231,17 @@
             this.orgTreeConfig.data = res.data
             // 加载后选中第一条，查询第一组织用户
             if (res.data && res.data.length > 0) {
-              this.orgTreeConfig.currentKey = currentData ? currentData.id : res.data[0].id
-              this.orgTreeConfig.currentNodeData = currentData ? currentData : res.data[0]
-              this.orgTreeConfig.expandedKeys = [].push(currentData ? currentData.id : res.data[0].id)
-              this.userQuery.organizationId = currentData ? currentData.id : res.data[0].id
+                if (currentData) {
+                  this.orgTreeConfig.currentKey = currentData.id
+                  this.orgTreeConfig.currentNodeData = currentData
+                  this.orgTreeConfig.expandedKeys = [currentData.id]
+                  this.userQuery.organizationId = currentData.id
+                } else {
+                  this.orgTreeConfig.currentKey = res.data[0].id
+                  this.orgTreeConfig.currentNodeData = res.data[0]
+                  this.orgTreeConfig.expandedKeys = [res.data[0].id]
+                  this.userQuery.organizationId = res.data[0].id
+                }
             }
             this.pageUsers()
           }
@@ -305,6 +312,8 @@
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
               this.$message.success(res.msg)
+              // 关闭弹窗
+              this.organizationDialogConfig.visible = false
               // 刷新组织树，并选中新添加的节点
               this.orgTreeConfig_initData(res.data)
             } else {
