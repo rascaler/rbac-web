@@ -71,7 +71,7 @@
         </el-row>
         <!-- 操作栏-->
         <el-row>
-          <el-button type="primary" icon="plus" @click="dialogConfig.visible = true">添加</el-button>
+          <el-button type="primary" icon="plus" @click="userDialogConfig.visible = true">添加</el-button>
         </el-row>
         <!-- 表格-->
         <el-row>
@@ -109,23 +109,69 @@
           </el-pagination>
         </el-row>
 
-        <!-- 对话框-->
+        <!-- 添加用户对话框-->
         <el-row>
-          <el-dialog :title="dialogConfig.title" :visible.sync="dialogConfig.visible">
-            <el-form :model="form">
-              <el-form-item label="活动名称" :label-width="formLabelWidth">
-                <el-input v-model="form.name" auto-complete="off"></el-input>
+          <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible">
+            <el-form :model="userFormConfig" :label-width="userFormConfig.style.labelWidth">
+              <el-form-item label="用户名">
+                <el-input v-model="userFormConfig.data.username" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="活动区域" :label-width="formLabelWidth">
-                <el-select v-model="form.region" placeholder="请选择活动区域">
-                  <el-option label="区域一" value="shanghai"></el-option>
-                  <el-option label="区域二" value="beijing"></el-option>
+              <el-form-item label="密码">
+                <el-input type="password" v-model="userFormConfig.data.password" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="确认密码">
+                <el-input type="password" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="账户状态">
+                <el-radio-group v-model="userFormConfig.data.state">
+                  <el-radio v-for="item in userFormConfig.stateOption.options"
+                            :key="item.label"
+                            :label="item.label"
+                            >{{item.text}}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="真实姓名">
+                <el-input v-model="userFormConfig.data.name" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="性别">
+                <el-radio-group v-model="userFormConfig.data.sex">
+                  <el-radio v-for="item in userFormConfig.sexOption.options"
+                            :key="item.label"
+                            :label="item.label"
+                  >{{item.text}}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="职务">
+                <el-select v-model="userFormConfig.data.post">
+                  <el-option
+                    v-for="item in userFormConfig.postOption.options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
                 </el-select>
+              </el-form-item>
+              <el-form-item label="在职状态">
+                <el-radio-group v-model="userFormConfig.data.postState">
+                  <el-radio v-for="item in userFormConfig.postStateOption.options"
+                            :key="item.label"
+                            :label="item.label"
+                  >{{item.text}}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="昵称">
+                <el-input v-model="userFormConfig.data.nickName" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="邮箱">
+                <el-input v-model="userFormConfig.data.email" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="手机号">
+                <el-input v-model="userFormConfig.data.phone" auto-complete="off"></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogConfig.visible = false">取 消</el-button>
-              <el-button type="primary" @click="dialogConfig.visible = false">确 定</el-button>
+              <el-button @click="userDialogConfig.visible = false">取 消</el-button>
+              <el-button type="primary" @click="userDialogConfig.visible = false">确 定</el-button>
             </div>
           </el-dialog>
         </el-row>
@@ -136,7 +182,7 @@
             <el-tabs v-model="organizationTabConfig.activeName" type="border-card" @tab-click="handleClick">
               <el-tab-pane label="部门信息" name="first">
                 <el-row>
-                  <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWith">
+                  <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWidth">
                     <el-form-item prop="parentName" label="上级部门">
                       <el-select v-model="organizationFormConfig.data.parentName" placeholder="请选择父组织" disabled>
                         <el-option label="区域一" value="shanghai"></el-option>
@@ -371,7 +417,16 @@
         })
         // 先查询详情
         this.organizationDialogOpen(e, data)
-      }
+      },
+      userDialogOpen (e, data, type) {
+        if (type === 'add') { // 添加
+
+        } else { // 修改
+        }
+      },
+      saveUser () {},
+      updateUser () {},
+      getUserDetail () {}
     },
 
     data () {
@@ -390,7 +445,7 @@
               label: '禁用'
             }]
         },
-        dialogConfig: {
+        userDialogConfig: {
             visible: false,
             title: '添加'
         },
@@ -403,15 +458,68 @@
           },
           size: 'small'
         },
-        form: {
-          name: '',
-          region: '1111',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: ''
+        userFormConfig: {
+          data: {
+            name: '',
+            password: '',
+            passwordConfirm: '',
+            state: 0,
+            nickName: '',
+            email: '',
+            wechat: '',
+            phone: '',
+            sex: 0,
+            post: 0,
+            postState: 1
+          },
+          style: {
+            labelWidth: '80px'
+          },
+          stateOption: {
+            options: [{
+              label: 1,
+              text: '启用'
+            }, {
+              label: 0,
+              text: '禁用'
+            }]
+          },
+          sexOption: {
+            default: 0,
+            options: [{
+              label: 0,
+              text: '未知'
+            }, {
+              label: 1,
+              text: '男'
+            }, {
+              label: 2,
+              text: '女'
+            }]
+          },
+          postStateOption: {
+            default: 0,
+            options: [{
+              label: 0,
+              text: '离职'
+            }, {
+              label: 1,
+              text: '在职'
+            }, {
+              label: 2,
+              text: '管理员'
+            }]
+          },
+          postOption: {
+            value: 0,
+            options: [{
+              value: 0,
+              label: '管理员'
+            }, {
+              value: 1,
+              label: '用户'
+            }]
+          }
         },
         organizationFormConfig: {
           data: {
@@ -423,7 +531,7 @@
             description: ''
           },
           style: {
-              labelWith: '80px'
+            labelWidth: '80px'
           }
         },
         formLabelWidth: '80px',
