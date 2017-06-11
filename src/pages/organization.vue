@@ -330,7 +330,7 @@
                 <li class="el-dropdown-menu__item node" on-click={ (e) => this.organizationDialogOpen(e, data) }>
                   <i class="el-icon-plus"></i> &nbsp;添加子组织</li>
                 <li class="el-dropdown-menu__item" on-click={ (e) => this.getOrganizationDetail(e, data) }><i class="el-icon-edit"></i> &nbsp;修改</li>
-                <li class="el-dropdown-menu__item" on-click={ (e) => this.removeOrganziaton(e, store, data) }><i class="el-icon-delete"></i> &nbsp;删除</li>
+                <li class="el-dropdown-menu__item" on-click={ (e) => this.removeConfirm(e, store, data) }><i class="el-icon-delete"></i> &nbsp;删除</li>
                 <li class="el-dropdown-menu__item el-dropdown-menu__item--divided is-disabled is-divided" >&nbsp;ID: {data.id}</li>
               </ul>
             </span>
@@ -394,6 +394,17 @@
             }
         }).catch(function (response) {
           console.log(response)
+        })
+      },
+      removeConfirm (e, store, data) {
+        this.$confirm('此操作将永久删除该组织, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+            this.removeOrganziaton(e, store, data)
+        }).catch(() => {
+
         })
       },
       removeOrganziaton (e, store, data) {
