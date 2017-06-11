@@ -113,6 +113,14 @@
         <el-row>
           <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible">
             <el-form :model="userFormConfig" :label-width="userFormConfig.style.labelWidth">
+              <el-form-item label="用户类型">
+                <el-radio-group v-model="userFormConfig.data.type">
+                  <el-radio v-for="item in userFormConfig.typeOption.options"
+                            :key="item.label"
+                            :label="item.label"
+                  >{{item.text}}</el-radio>
+                </el-radio-group>
+              </el-form-item>
               <el-form-item label="用户名">
                 <el-input v-model="userFormConfig.data.username" auto-complete="off"></el-input>
               </el-form-item>
@@ -142,7 +150,7 @@
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="职务">
-                <el-select v-model="userFormConfig.data.post">
+                <el-select v-model="userFormConfig.data.post" multiple>
                   <el-option
                     v-for="item in userFormConfig.postOption.options"
                     :key="item.value"
@@ -151,6 +159,7 @@
                   </el-option>
                 </el-select>
               </el-form-item>
+
               <el-form-item label="在职状态">
                 <el-radio-group v-model="userFormConfig.data.postState">
                   <el-radio v-for="item in userFormConfig.postStateOption.options"
@@ -171,7 +180,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="userDialogConfig.visible = false">取 消</el-button>
-              <el-button type="primary" @click="userDialogConfig.visible = false">确 定</el-button>
+              <el-button type="primary" @click="userSaveOrUpdate">确 定</el-button>
             </div>
           </el-dialog>
         </el-row>
@@ -181,21 +190,21 @@
           <el-dialog :size="organizationDialogConfig.size" :title="organizationDialogConfig.title" :visible.sync="organizationDialogConfig.visible">
             <el-tabs v-model="organizationTabConfig.activeName" type="border-card" @tab-click="handleClick">
               <el-tab-pane label="部门信息" name="first">
+                <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWidth">
+                  <el-form-item prop="parentName" label="上级部门">
+                    <el-select v-model="organizationFormConfig.data.parentName" placeholder="请选择父组织" disabled>
+                      <el-option label="区域一" value="shanghai"></el-option>
+                      <el-option label="区域二" value="beijing"></el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item prop="name" label="部门名称">
+                    <el-input v-model="organizationFormConfig.data.name" auto-complete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item label="描述">
+                    <el-input type="textarea" v-model="organizationFormConfig.data.description"></el-input>
+                  </el-form-item>
+                </el-form>
                 <el-row>
-                  <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWidth">
-                    <el-form-item prop="parentName" label="上级部门">
-                      <el-select v-model="organizationFormConfig.data.parentName" placeholder="请选择父组织" disabled>
-                        <el-option label="区域一" value="shanghai"></el-option>
-                        <el-option label="区域二" value="beijing"></el-option>
-                      </el-select>
-                    </el-form-item>
-                    <el-form-item prop="name" label="部门名称">
-                      <el-input v-model="organizationFormConfig.data.name" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="描述">
-                      <el-input type="textarea" v-model="organizationFormConfig.data.description"></el-input>
-                    </el-form-item>
-                  </el-form>
                 </el-row>
               </el-tab-pane>
               <el-tab-pane label="角色配置" name="second">
@@ -255,7 +264,8 @@
         this.organizationFormConfig.data.parentId = data.id
         this.organizationFormConfig.data.parentName = data.name
         // 查询所有角色
-        this.$http.get(CONSTANT.API_URL.ROLE.GET_ALL, {
+        this.$http.get(CONSTANT.API_URL.ROLE.GET_ORGANIZATION_ROLES, {
+            params: {organizationId: data.id}
         }).then((response) => {
           let res = response.data
           if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -339,6 +349,19 @@
             this.dataGridConfig.total = res.data.total
           }
         }).catch(function (response) {
+          console.log(response)
+        })
+      },
+      userSaveOrUpdate () {
+        this.$http.post(CONSTANT.API_URL.USER.SAVE_OR_UPDATE, JSON.stringify(this.userFormConfig.data))
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              this.$message.success(res.msg)
+            } else {
+              this.$message.error(res.msg)
+            }
+          }).catch(function (response) {
           console.log(response)
         })
       },
@@ -469,8 +492,9 @@
             wechat: '',
             phone: '',
             sex: 0,
-            post: 0,
-            postState: 1
+            post: [],
+            postState: 1,
+            type: 0
           },
           style: {
             labelWidth: '80px'
@@ -505,13 +529,23 @@
             }, {
               label: 1,
               text: '在职'
+            }]
+          },
+          typeOption: {
+            default: 0,
+            options: [{
+              label: 0,
+              text: '用户'
+            }, {
+              label: 1,
+              text: '管理员'
             }, {
               label: 2,
-              text: '管理员'
+              text: '用户兼管理员'
             }]
           },
           postOption: {
-            value: 0,
+            value: [],
             options: [{
               value: 0,
               label: '管理员'
@@ -572,7 +606,7 @@
           },
           data: [],
           selectValue: [],
-          titles: ['可选角色', '已选角色']
+          titles: ['可分配角色', '已分配角色']
         }
       }
     }

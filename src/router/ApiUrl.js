@@ -1,7 +1,8 @@
 const API_URL = {
   EXAMPLE: 'static/user.json',
   USER: {
-    PAGE_USERS: 'user/pageUsers'
+    PAGE_USERS: 'user/pageUsers',
+    SAVE_OR_UPDATE: 'user/saveOrUpdate'
   },
   ORGANIZATION: {
     GET_ORG_TREE: 'organization/getOrgTree',
@@ -10,7 +11,8 @@ const API_URL = {
     DETAIL: 'organization/detail'
   },
   ROLE: {
-    GET_ALL: 'role/getAll'
+    GET_ALL: 'role/getAll',
+    GET_ORGANIZATION_ROLES: 'role/getOrganizationRoles'
   }
 }
 export default API_URL
