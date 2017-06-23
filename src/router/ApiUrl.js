@@ -12,7 +12,8 @@ const API_URL = {
   },
   ROLE: {
     GET_ALL: 'role/getAll',
-    GET_ORGANIZATION_ROLES: 'role/getOrganizationRoles'
+    GET_ORGANIZATION_ROLES: 'role/getOrganizationRoles',
+    GET_USER_ROLES: 'role/getUserRoles'
   }
 }
 export default API_URL
