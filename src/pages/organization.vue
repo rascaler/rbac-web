@@ -128,7 +128,7 @@
                 <el-input type="password" v-model="userFormConfig.data.password" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="确认密码">
-                <el-input type="password" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
+                <el-input type="passwordConfirm" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="账户状态">
                 <el-radio-group v-model="userFormConfig.data.state">
