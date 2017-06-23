@@ -264,8 +264,7 @@
         this.organizationFormConfig.data.parentId = data.id
         this.organizationFormConfig.data.parentName = data.name
         // 查询所有角色
-        this.$http.get(CONSTANT.API_URL.ROLE.GET_ORGANIZATION_ROLES, {
-            params: {organizationId: data.id}
+        this.$http.get(CONSTANT.API_URL.ROLE.GET_USER_ROLES, {
         }).then((response) => {
           let res = response.data
           if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
