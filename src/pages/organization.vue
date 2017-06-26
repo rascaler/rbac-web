@@ -71,7 +71,7 @@
         </el-row>
         <!-- 操作栏-->
         <el-row>
-          <el-button type="primary" icon="plus" @click="userDialogConfig.visible = true">添加</el-button>
+          <el-button type="primary" icon="plus" @click="userDialogOpen($event ,'add')">添加</el-button>
         </el-row>
         <!-- 表格-->
         <el-row>
@@ -111,7 +111,7 @@
 
         <!-- 添加用户对话框-->
         <el-row>
-          <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible">
+          <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible" @close="clearUserForm">
             <el-form :model="userFormConfig" :label-width="userFormConfig.style.labelWidth">
               <el-form-item label="用户类型">
                 <el-radio-group v-model="userFormConfig.data.type">
@@ -130,14 +130,14 @@
               <el-form-item label="确认密码">
                 <el-input type="passwordConfirm" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="账户状态">
-                <el-radio-group v-model="userFormConfig.data.state">
-                  <el-radio v-for="item in userFormConfig.stateOption.options"
-                            :key="item.label"
-                            :label="item.label"
-                            >{{item.text}}</el-radio>
-                </el-radio-group>
-              </el-form-item>
+              <!--<el-form-item label="账户状态">-->
+                <!--<el-radio-group v-model="userFormConfig.data.state">-->
+                  <!--<el-radio v-for="item in userFormConfig.stateOption.options"-->
+                            <!--:key="item.label"-->
+                            <!--:label="item.label"-->
+                            <!--&gt;{{item.text}}</el-radio>-->
+                <!--</el-radio-group>-->
+              <!--</el-form-item>-->
               <el-form-item label="真实姓名">
                 <el-input v-model="userFormConfig.data.name" auto-complete="off"></el-input>
               </el-form-item>
@@ -150,7 +150,7 @@
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="职务">
-                <el-select v-model="userFormConfig.data.post" multiple>
+                <el-select v-model="userFormConfig.data.roleIds" multiple>
                   <el-option
                     v-for="item in userFormConfig.postOption.options"
                     :key="item.value"
@@ -160,14 +160,14 @@
                 </el-select>
               </el-form-item>
 
-              <el-form-item label="在职状态">
-                <el-radio-group v-model="userFormConfig.data.postState">
-                  <el-radio v-for="item in userFormConfig.postStateOption.options"
-                            :key="item.label"
-                            :label="item.label"
-                  >{{item.text}}</el-radio>
-                </el-radio-group>
-              </el-form-item>
+              <!--<el-form-item label="在职状态">-->
+                <!--<el-radio-group v-model="userFormConfig.data.postState">-->
+                  <!--<el-radio v-for="item in userFormConfig.postStateOption.options"-->
+                            <!--:key="item.label"-->
+                            <!--:label="item.label"-->
+                  <!--&gt;{{item.text}}</el-radio>-->
+                <!--</el-radio-group>-->
+              <!--</el-form-item>-->
               <el-form-item label="昵称">
                 <el-input v-model="userFormConfig.data.nickName" auto-complete="off"></el-input>
               </el-form-item>
@@ -187,7 +187,7 @@
 
         <!-- 添加组织对话框-->
         <el-row>
-          <el-dialog :size="organizationDialogConfig.size" :title="organizationDialogConfig.title" :visible.sync="organizationDialogConfig.visible">
+          <el-dialog :size="organizationDialogConfig.size" :title="organizationDialogConfig.title" :visible.sync="organizationDialogConfig.visible" @close = "clearOrganizationForm">
             <el-tabs v-model="organizationTabConfig.activeName" type="border-card" @tab-click="handleClick">
               <el-tab-pane label="部门信息" name="first">
                 <el-form :model="organizationFormConfig.data" ref="organizationFormConfig" :label-width="organizationFormConfig.style.labelWidth">
@@ -233,6 +233,96 @@
 
 <script>
   import CONSTANT from '../commons/constant'
+
+  const userFormConfigInit = {
+    data: {
+      name: '',
+      password: '',
+      passwordConfirm: '',
+      state: 0,
+      nickName: '',
+      email: '',
+      wechat: '',
+      phone: '',
+      sex: 0,
+      roleIds: [],
+      postState: 1,
+      type: 0,
+      organizationIds: []
+    },
+    style: {
+      labelWidth: '80px'
+    },
+    stateOption: {
+      options: [{
+        label: 1,
+        text: '启用'
+      }, {
+        label: 0,
+        text: '禁用'
+      }]
+    },
+    sexOption: {
+      default: 0,
+      options: [{
+        label: 0,
+        text: '未知'
+      }, {
+        label: 1,
+        text: '男'
+      }, {
+        label: 2,
+        text: '女'
+      }]
+    },
+    postStateOption: {
+      default: 0,
+      options: [{
+        label: 0,
+        text: '离职'
+      }, {
+        label: 1,
+        text: '在职'
+      }]
+    },
+    typeOption: {
+      default: 0,
+      options: [{
+        label: 0,
+        text: '用户'
+      }, {
+        label: 1,
+        text: '管理员'
+      }, {
+        label: 2,
+        text: '用户兼管理员'
+      }]
+    },
+    postOption: {
+      value: [],
+      options: [{
+        value: 0,
+        label: '管理员'
+      }, {
+        value: 1,
+        label: '用户'
+      }]
+    }
+  }
+  const organizationFormConfigInit = {
+    data: {
+      roleIds: [],
+      parentId: '',
+      name: '',
+      parentName: '',
+      id: '',
+      description: ''
+    },
+    style: {
+      labelWidth: '80px'
+    }
+  }
+
   export default {
     name: 'organization',
     mounted () {
@@ -254,6 +344,15 @@
       }
     },
     methods: {
+      test () { alert(1) },
+      clearOrganizationForm () {
+          this.organizationFormConfig = Object.assign({}, organizationFormConfigInit)
+      },
+      clearUserForm () {
+          let a = Object.assign({}, userFormConfigInit)
+          console.log(a)
+//          this.userFormConfig = a
+      },
       organizationDialogOpen (e, data) {
         // 重置表单
         if (this.$refs['organizationFormConfig']) this.$refs['organizationFormConfig'].resetFields()
@@ -352,6 +451,7 @@
         })
       },
       userSaveOrUpdate () {
+        this.userFormConfig.data.organizationIds.push(this.orgTreeConfig.currentNodeData.id)
         this.$http.post(CONSTANT.API_URL.USER.SAVE_OR_UPDATE, JSON.stringify(this.userFormConfig.data))
           .then((response) => {
             let res = response.data
@@ -451,15 +551,36 @@
         // 先查询详情
         this.organizationDialogOpen(e, data)
       },
-      userDialogOpen (e, data, type) {
+      userDialogOpen (e, type, data) {
         if (type === 'add') { // 添加
-
+           // 获取当前用户角色
+          this.getUserRoles()
         } else { // 修改
         }
       },
-      saveUser () {},
+      saveOrUpdateUser () {},
       updateUser () {},
-      getUserDetail () {}
+      getUserDetail () {},
+      getUserRoles (callback) {
+        this.$http.get(CONSTANT.API_URL.ROLE.GET_USER_ROLES, {
+        }).then((response) => {
+          let res = response.data
+          if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+            if (res.data) {
+              this.userFormConfig.postOption.options = []
+              for (let item of res.data) {
+                this.userFormConfig.postOption.options.push({value: item.id, label: item.name})
+              }
+            }
+          }
+          return response
+        }).then((response) => {
+          if (callback) callback()
+          this.userDialogConfig.visible = true
+        }).catch(function (response) {
+          console.log(response)
+        })
+      }
     },
 
     data () {
@@ -491,93 +612,8 @@
           },
           size: 'small'
         },
-        userFormConfig: {
-          data: {
-            name: '',
-            password: '',
-            passwordConfirm: '',
-            state: 0,
-            nickName: '',
-            email: '',
-            wechat: '',
-            phone: '',
-            sex: 0,
-            post: [],
-            postState: 1,
-            type: 0
-          },
-          style: {
-            labelWidth: '80px'
-          },
-          stateOption: {
-            options: [{
-              label: 1,
-              text: '启用'
-            }, {
-              label: 0,
-              text: '禁用'
-            }]
-          },
-          sexOption: {
-            default: 0,
-            options: [{
-              label: 0,
-              text: '未知'
-            }, {
-              label: 1,
-              text: '男'
-            }, {
-              label: 2,
-              text: '女'
-            }]
-          },
-          postStateOption: {
-            default: 0,
-            options: [{
-              label: 0,
-              text: '离职'
-            }, {
-              label: 1,
-              text: '在职'
-            }]
-          },
-          typeOption: {
-            default: 0,
-            options: [{
-              label: 0,
-              text: '用户'
-            }, {
-              label: 1,
-              text: '管理员'
-            }, {
-              label: 2,
-              text: '用户兼管理员'
-            }]
-          },
-          postOption: {
-            value: [],
-            options: [{
-              value: 0,
-              label: '管理员'
-            }, {
-              value: 1,
-              label: '用户'
-            }]
-          }
-        },
-        organizationFormConfig: {
-          data: {
-            roleIds: [],
-            parentId: '',
-            name: '',
-            parentName: '',
-            id: '',
-            description: ''
-          },
-          style: {
-            labelWidth: '80px'
-          }
-        },
+        userFormConfig: Object.assign({}, userFormConfigInit),
+        organizationFormConfig: Object.assign({}, organizationFormConfigInit),
         formLabelWidth: '80px',
         orgTreeConfig: {
           props: {
