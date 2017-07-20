@@ -2,7 +2,8 @@ const API_URL = {
   EXAMPLE: 'static/user.json',
   USER: {
     PAGE_USERS: 'user/pageUsers',
-    SAVE_OR_UPDATE: 'user/saveOrUpdate',
+    SAVE: 'user/save',
+    UPDATE: 'user/update',
     DETAIL: 'user/detail'
   },
   ORGANIZATION: {

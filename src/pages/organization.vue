@@ -112,7 +112,7 @@
         <!-- 添加用户对话框-->
         <el-row>
           <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible" @close="clearUserForm">
-            <el-form :model="userFormConfig" :label-width="userFormConfig.style.labelWidth">
+            <el-form :model="userFormConfig" :rules="userFormConfig.rules" ref="userForm" :label-width="userFormConfig.style.labelWidth">
               <el-form-item label="用户类型">
                 <el-radio-group v-model="userFormConfig.data.type">
                   <el-radio v-for="item in userFormConfig.typeOption.options"
@@ -124,11 +124,14 @@
               <el-form-item label="用户名">
                 <el-input v-model="userFormConfig.data.username" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="密码">
+              <el-form-item label="密码" prop="password">
                 <el-input type="password" v-model="userFormConfig.data.password" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="确认密码">
-                <el-input type="passwordConfirm" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
+              <el-form-item label="确认密码" prop="passwordConfirm">
+                <el-input type="password" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="test" prop="test">
+                <el-input type="text" v-model="test" auto-complete="off"></el-input>
               </el-form-item>
               <!--<el-form-item label="账户状态">-->
                 <!--<el-radio-group v-model="userFormConfig.data.state">-->
@@ -179,7 +182,7 @@
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="userDialogConfig.visible = false">取 消</el-button>
+              <el-button @click="userDialogClose">取 消</el-button>
               <el-button type="primary" @click="userSaveOrUpdate">确 定</el-button>
             </div>
           </el-dialog>
@@ -234,11 +237,10 @@
 <script>
   import CONSTANT from '../commons/constant'
 
-  const userFormConfigInit = {
-    data: {
+  const userFormInit = {
       id: '',
-      name: '',
       username: '',
+      name: '',
       password: '',
       passwordConfirm: '',
       state: 0,
@@ -251,65 +253,6 @@
       postState: 1,
       type: 0,
       organizationIds: []
-    },
-    style: {
-      labelWidth: '80px'
-    },
-    stateOption: {
-      options: [{
-        label: 1,
-        text: '启用'
-      }, {
-        label: 0,
-        text: '禁用'
-      }]
-    },
-    sexOption: {
-      default: 0,
-      options: [{
-        label: 0,
-        text: '未知'
-      }, {
-        label: 1,
-        text: '男'
-      }, {
-        label: 2,
-        text: '女'
-      }]
-    },
-    postStateOption: {
-      default: 0,
-      options: [{
-        label: 0,
-        text: '离职'
-      }, {
-        label: 1,
-        text: '在职'
-      }]
-    },
-    typeOption: {
-      default: 0,
-      options: [{
-        label: 0,
-        text: '用户'
-      }, {
-        label: 1,
-        text: '管理员'
-      }, {
-        label: 2,
-        text: '用户兼管理员'
-      }]
-    },
-    postOption: {
-      value: [],
-      options: [{
-        value: 0,
-        label: '管理员'
-      }, {
-        value: 1,
-        label: '用户'
-      }]
-    }
   }
   const organizationFormConfigInit = {
     data: {
@@ -348,11 +291,11 @@
     methods: {
       test () { alert(1) },
       clearOrganizationForm () {
-          this.organizationFormConfig = Object.assign({}, organizationFormConfigInit)
+//          this.organizationFormConfig = Object.assign({}, organizationFormConfigInit)
       },
       clearUserForm () {
-          let a = Object.assign({}, userFormConfigInit)
-          console.log(a)
+//          let a = Object.assign({}, userFormConfigInit)
+//          console.log(a)
 //          this.userFormConfig = a
       },
       organizationDialogOpen (e, data) {
@@ -453,18 +396,23 @@
         })
       },
       userSaveOrUpdate () {
-        this.userFormConfig.data.organizationIds.push(this.orgTreeConfig.currentNodeData.id)
-        this.$http.post(CONSTANT.API_URL.USER.SAVE_OR_UPDATE, JSON.stringify(this.userFormConfig.data))
-          .then((response) => {
-            let res = response.data
-            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
-              this.$message.success(res.msg)
-            } else {
-              this.$message.error(res.msg)
-            }
-          }).catch(function (response) {
-          console.log(response)
-        })
+        this.validateForm('userForm')
+//        let formData = this.userFormConfig.data
+//        let url
+//        if (formData.id !== null && formData.id !== '') url = CONSTANT.API_URL.USER.UPDATE
+//        else url = CONSTANT.API_URL.USER.SAVE
+//        this.userFormConfig.data.organizationIds.push(this.orgTreeConfig.currentNodeData.id)
+//        this.$http.post(url, JSON.stringify(this.userFormConfig.data))
+//          .then((response) => {
+//            let res = response.data
+//            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+//              this.$message.success(res.msg)
+//            } else {
+//              this.$message.error(res.msg)
+//            }
+//          }).catch(function (response) {
+//          console.log(response)
+//        })
       },
       dataGrid_handleSizeChange (pageSize) {
         this.dataGridConfig.pageSize = pageSize
@@ -553,6 +501,7 @@
         // 先查询详情
         this.organizationDialogOpen(e, data)
       },
+      // >>>>>>>>>>>>>>>>>>userDialogConfig<<<<<<<<<<<<<<<<<<<<<<
       userDialogOpen (e, type, data) {
         if (type === 'add') { // 添加
            // 获取当前用户角色
@@ -563,8 +512,11 @@
           this.getUserDetail(data.id)
         }
       },
-      saveOrUpdateUser () {},
-      updateUser () {},
+      userDialogClose () {
+        // 清理dialog
+        this.userFormConfig.data = JSON.parse(JSON.stringify(userFormInit))
+        this.userDialogConfig.visible = false
+      },
       getUserDetail (id) {
         this.$http.get(CONSTANT.API_URL.USER.DETAIL, {
             params: {id: id}
@@ -611,11 +563,47 @@
         }).catch(function (response) {
           console.log(response)
         })
+      },
+      validateForm (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            alert('submit!')
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
       }
     },
 
     data () {
+      // userForm验证
+      var validatePass = (rule, value, callback) => {
+        if (value === undefined || value === '') {
+          callback(new Error('请输入密码'))
+        } else {
+          if (this.userFormConfig.data.password !== '') {
+            this.$refs.userForm.validateField('passwordConfirm')
+          }
+          callback()
+        }
+      }
+      var validatePassConfirm = (rule, value, callback) => {
+        if (value === undefined || value === '') {
+          callback(new Error('请再次输入密码'))
+        } else if (value !== this.userFormConfig.data.password) {
+            console.log(value)
+          callback(new Error('两次输入密码不一致!'))
+        } else {
+          callback()
+        }
+      }
+      var validateTest = (rule, value, callback) => {
+        console.log(value)
+      }
+      // organizationForm验证
       return {
+        test: '',
         activeName2: 'first',
         useStateOption: {
             value: '',
@@ -639,12 +627,83 @@
           title: '添加',
           style: {
               width: '120px'
-
           },
           size: 'small'
         },
-        userFormConfig: Object.assign({}, userFormConfigInit),
-        organizationFormConfig: Object.assign({}, organizationFormConfigInit),
+        userFormConfig: {
+          data: JSON.parse(JSON.stringify(userFormInit)),
+          rules: {
+//            phone: '',
+//            email: '',
+//            username: '',
+            test: [{ validator: validateTest, trigger: 'blur' }],
+            password: [
+              { validator: validatePass, trigger: 'blur' }
+            ],
+            passwordConfirm: [
+              { validator: validatePassConfirm, trigger: 'blur' }
+            ]
+          },
+          style: {
+            labelWidth: '80px'
+          },
+          stateOption: {
+            options: [{
+              label: 1,
+              text: '启用'
+            }, {
+              label: 0,
+              text: '禁用'
+            }]
+          },
+          sexOption: {
+            default: 0,
+            options: [{
+              label: 0,
+              text: '未知'
+            }, {
+              label: 1,
+              text: '男'
+            }, {
+              label: 2,
+              text: '女'
+            }]
+          },
+          postStateOption: {
+            default: 0,
+            options: [{
+              label: 0,
+              text: '离职'
+            }, {
+              label: 1,
+              text: '在职'
+            }]
+          },
+          typeOption: {
+            default: 0,
+            options: [{
+              label: 0,
+              text: '用户'
+            }, {
+              label: 1,
+              text: '管理员'
+            }, {
+              label: 2,
+              text: '用户兼管理员'
+            }]
+          },
+          postOption: {
+            value: [],
+            options: [{
+              value: 0,
+              label: '管理员'
+            }, {
+              value: 1,
+              label: '用户'
+            }]
+          }
+        },
+        organizationFormConfig: JSON.parse(JSON.stringify(organizationFormConfigInit)),
         formLabelWidth: '80px',
         orgTreeConfig: {
           props: {
