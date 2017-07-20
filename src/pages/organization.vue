@@ -87,7 +87,7 @@
               <template scope="scope">
                 <el-button
                   size="small"
-                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                  @click="userDialogOpen($event, 'update', scope.row)">编辑</el-button>
                 <el-button
                   size="small"
                   type="danger"
@@ -236,7 +236,9 @@
 
   const userFormConfigInit = {
     data: {
+      id: '',
       name: '',
+      username: '',
       password: '',
       passwordConfirm: '',
       state: 0,
@@ -556,11 +558,40 @@
            // 获取当前用户角色
           this.getUserRoles()
         } else { // 修改
+          // 查询用户详情
+          this.getUserRoles()
+          this.getUserDetail(data.id)
         }
       },
       saveOrUpdateUser () {},
       updateUser () {},
-      getUserDetail () {},
+      getUserDetail (id) {
+        this.$http.get(CONSTANT.API_URL.USER.DETAIL, {
+            params: {id: id}
+        }).then((response) => {
+          let res = response.data
+          if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+            let data = res.data
+            if (res.data) {
+              this.userFormConfig.data.id = data.id
+              this.userFormConfig.data.nickName = data.nickName
+              this.userFormConfig.data.postState = data.postState
+              this.userFormConfig.data.state = data.state
+              this.userFormConfig.data.organizationIds = data.organizations ? data.organizations.map(o => o.id) : []
+              this.userFormConfig.data.roleIds = data.roles ? data.roles.map(r => r.id) : []
+              this.userFormConfig.data.name = data.name
+              this.userFormConfig.data.email = data.email
+              this.userFormConfig.data.phone = data.phone
+              this.userFormConfig.data.sex = data.sex
+              this.userFormConfig.data.type = data.type
+              this.userFormConfig.data.wechat = data.wechat
+            }
+          }
+          this.userDialogConfig.visible = true
+        }).catch(function (response) {
+          console.log(response)
+        })
+      },
       getUserRoles (callback) {
         this.$http.get(CONSTANT.API_URL.ROLE.GET_USER_ROLES, {
         }).then((response) => {
