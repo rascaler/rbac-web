@@ -121,7 +121,7 @@
                   >{{item.text}}</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="用户名">
+              <el-form-item label="用户名" prop="username">
                 <el-input v-model="userFormConfig.data.username" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="密码" prop="password">
@@ -138,7 +138,7 @@
                             <!--&gt;{{item.text}}</el-radio>-->
                 <!--</el-radio-group>-->
               <!--</el-form-item>-->
-              <el-form-item label="真实姓名">
+              <el-form-item label="真实姓名" prop="name">
                 <el-input v-model="userFormConfig.data.name" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="性别">
@@ -149,7 +149,7 @@
                   >{{item.text}}</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="职务">
+              <el-form-item label="职务" prop="roleIds">
                 <el-select v-model="userFormConfig.data.roleIds" multiple>
                   <el-option
                     v-for="item in userFormConfig.postOption.options"
@@ -168,13 +168,13 @@
                   <!--&gt;{{item.text}}</el-radio>-->
                 <!--</el-radio-group>-->
               <!--</el-form-item>-->
-              <el-form-item label="昵称">
+              <el-form-item label="昵称" prop="nickName">
                 <el-input v-model="userFormConfig.data.nickName" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="邮箱">
+              <el-form-item label="邮箱" prop="email">
                 <el-input v-model="userFormConfig.data.email" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="手机号">
+              <el-form-item label="手机号" prop="phone">
                 <el-input v-model="userFormConfig.data.phone" auto-complete="off"></el-input>
               </el-form-item>
             </el-form>
@@ -575,25 +575,28 @@
 
     data () {
       // userForm验证
-      var validatePass = (rule, value, callback) => {
-        if (value === undefined || value === '') {
-          callback(new Error('请输入密码'))
-        } else {
-          if (this.userFormConfig.data.password !== '') {
-            this.$refs.userForm.validateField('passwordConfirm')
-          }
-          callback()
+      let validatePass = (rule, value, callback) => {
+        if (this.userFormConfig.data.password !== '') {
+          this.$refs.userForm.validateField('passwordConfirm')
         }
+        callback()
       }
-      var validatePassConfirm = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入密码'))
-        } else if (value !== this.userFormConfig.data.password) {
+      let validatePassConfirm = (rule, value, callback) => {
+        if (value !== this.userFormConfig.data.password) {
           callback(new Error('两次输入密码不一致!'))
         } else {
           callback()
         }
       }
+      // 手机号码验证
+      let validatePhone = (rule, value, callback) => {
+        if (!(/^1[3|4|5|8][0-9]\d{8}$/.test(this.userFormConfig.data.phone))) {
+          callback(new Error('手机号码不正确!'))
+        } else {
+          callback()
+        }
+      }
+
       // organizationForm验证
       return {
         test: '',
@@ -626,14 +629,36 @@
         userFormConfig: {
           data: JSON.parse(JSON.stringify(userFormInit)),
           rules: {
-//            phone: '',
-//            email: '',
-//            username: '',
+            phone: [
+              { required: true, message: '请输入11位手机号码', trigger: 'blur' },
+              { validator: validatePhone, trigger: 'blur,change' }
+            ],
+            email: [
+              { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+              { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+            ],
+            username: [
+              { required: true, message: '请输入用户名（由字母、数字、下划线组成）', trigger: 'blur' },
+              { min: 3, max: 5, message: '长度在 3 到 20 个字符（由字母、数字、下划线组成）', trigger: 'blur,change' }
+            ],
             password: [
+              { required: true, message: '请输入密码', trigger: 'blur' },
               { validator: validatePass, trigger: 'blur' }
             ],
             passwordConfirm: [
+              { required: true, message: '请再次输入密码', trigger: 'blur' },
               { validator: validatePassConfirm, trigger: 'blur' }
+            ],
+            nickName: [
+              { required: true, message: '请输入昵称', trigger: 'blur' },
+              { min: 1, max: 15, message: '长度在 1 到 15 个字符', trigger: 'blur,change' }
+            ],
+            name: [
+              { required: true, message: '请输入真实姓名', trigger: 'blur' },
+              { min: 1, max: 15, message: '长度在 1 到 15 个字符', trigger: 'blur,change' }
+            ],
+            roleIds: [
+              { type: 'array', required: true, message: '请选择职务', trigger: 'change' }
             ]
           },
           style: {

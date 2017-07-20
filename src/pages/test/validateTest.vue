@@ -14,6 +14,16 @@
         <el-button type="primary" @click="submitForm('ruleForm2')">提交</el-button>
         <el-button @click="resetForm('ruleForm2')">重置</el-button>
       </el-form-item>
+      <el-form-item
+        prop="email"
+        label="邮箱"
+        :rules="[
+      { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+      { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+    ]"
+      >
+        <el-input v-model.number="ruleForm2.email"></el-input>
+      </el-form-item>
     </el-form>
   </div>
 </template>
@@ -60,7 +70,8 @@
         ruleForm2: {
           pass: '',
           checkPass: '',
-          age: ''
+          age: '',
+          email: ''
         },
         rules2: {
           pass: [
