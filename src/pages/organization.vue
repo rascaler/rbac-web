@@ -112,7 +112,7 @@
         <!-- 添加用户对话框-->
         <el-row>
           <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible" @close="clearUserForm">
-            <el-form :model="userFormConfig" :rules="userFormConfig.rules" ref="userForm" :label-width="userFormConfig.style.labelWidth">
+            <el-form :model="userFormConfig.data" :rules="userFormConfig.rules" ref="userForm" :label-width="userFormConfig.style.labelWidth">
               <el-form-item label="用户类型">
                 <el-radio-group v-model="userFormConfig.data.type">
                   <el-radio v-for="item in userFormConfig.typeOption.options"
@@ -129,9 +129,6 @@
               </el-form-item>
               <el-form-item label="确认密码" prop="passwordConfirm">
                 <el-input type="password" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="test" prop="test">
-                <el-input type="text" v-model="test" auto-complete="off"></el-input>
               </el-form-item>
               <!--<el-form-item label="账户状态">-->
                 <!--<el-radio-group v-model="userFormConfig.data.state">-->
@@ -589,17 +586,13 @@
         }
       }
       var validatePassConfirm = (rule, value, callback) => {
-        if (value === undefined || value === '') {
+        if (value === '') {
           callback(new Error('请再次输入密码'))
         } else if (value !== this.userFormConfig.data.password) {
-            console.log(value)
           callback(new Error('两次输入密码不一致!'))
         } else {
           callback()
         }
-      }
-      var validateTest = (rule, value, callback) => {
-        console.log(value)
       }
       // organizationForm验证
       return {
@@ -636,7 +629,6 @@
 //            phone: '',
 //            email: '',
 //            username: '',
-            test: [{ validator: validateTest, trigger: 'blur' }],
             password: [
               { validator: validatePass, trigger: 'blur' }
             ],
