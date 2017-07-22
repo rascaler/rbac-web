@@ -87,6 +87,12 @@
               <template scope="scope">
                 <el-button
                   size="small"
+                  @click="leave(scope.row.id, scope.row.postState === 0 ? 1 : 0)">{{scope.row.postState === 0 ? '复职' : '离职'}}</el-button>
+                <el-button
+                  size="small"
+                  @click="updateState(scope.row.id, scope.row.state === 0 ? 1 : 0)">{{scope.row.state === 0 ? '启用' : '禁用'}}</el-button>
+                <el-button
+                  size="small"
                   @click="userDialogOpen($event, 'update', scope.row)">编辑</el-button>
                 <el-button
                   size="small"
@@ -111,7 +117,7 @@
 
         <!-- 添加用户对话框-->
         <el-row>
-          <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible" @close="clearUserForm">
+          <el-dialog :title="userDialogConfig.title" :visible.sync="userDialogConfig.visible" @close="closeUserDialog">
             <el-form :model="userFormConfig.data" :rules="userFormConfig.rules" ref="userForm" :label-width="userFormConfig.style.labelWidth">
               <el-form-item label="用户类型">
                 <el-radio-group v-model="userFormConfig.data.type">
@@ -121,13 +127,13 @@
                   >{{item.text}}</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="用户名" prop="username">
+              <el-form-item label="用户名" prop="username" v-if="userFormConfig.data.id != null && userFormConfig.data.id != ''? false : true">
                 <el-input v-model="userFormConfig.data.username" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="密码" prop="password">
+              <el-form-item label="密码" prop="password" v-if="userFormConfig.data.id != null && userFormConfig.data.id != ''? false : true">
                 <el-input type="password" v-model="userFormConfig.data.password" auto-complete="off"></el-input>
               </el-form-item>
-              <el-form-item label="确认密码" prop="passwordConfirm">
+              <el-form-item label="确认密码" prop="passwordConfirm" v-if="userFormConfig.data.id != null && userFormConfig.data.id != ''? false : true">
                 <el-input type="password" v-model="userFormConfig.data.passwordConfirm" auto-complete="off"></el-input>
               </el-form-item>
               <!--<el-form-item label="账户状态">-->
@@ -159,15 +165,6 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-
-              <!--<el-form-item label="在职状态">-->
-                <!--<el-radio-group v-model="userFormConfig.data.postState">-->
-                  <!--<el-radio v-for="item in userFormConfig.postStateOption.options"-->
-                            <!--:key="item.label"-->
-                            <!--:label="item.label"-->
-                  <!--&gt;{{item.text}}</el-radio>-->
-                <!--</el-radio-group>-->
-              <!--</el-form-item>-->
               <el-form-item label="昵称" prop="nickName">
                 <el-input v-model="userFormConfig.data.nickName" auto-complete="off"></el-input>
               </el-form-item>
@@ -179,7 +176,7 @@
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="userDialogClose">取 消</el-button>
+              <el-button @click="closeUserDialog">取 消</el-button>
               <el-button type="primary" @click="userSaveOrUpdate">确 定</el-button>
             </div>
           </el-dialog>
@@ -290,11 +287,6 @@
       clearOrganizationForm () {
 //          this.organizationFormConfig = Object.assign({}, organizationFormConfigInit)
       },
-      clearUserForm () {
-//          let a = Object.assign({}, userFormConfigInit)
-//          console.log(a)
-//          this.userFormConfig = a
-      },
       organizationDialogOpen (e, data) {
         // 重置表单
         if (this.$refs['organizationFormConfig']) this.$refs['organizationFormConfig'].resetFields()
@@ -393,23 +385,30 @@
         })
       },
       userSaveOrUpdate () {
-        this.validateForm('userForm')
-//        let formData = this.userFormConfig.data
-//        let url
-//        if (formData.id !== null && formData.id !== '') url = CONSTANT.API_URL.USER.UPDATE
-//        else url = CONSTANT.API_URL.USER.SAVE
-//        this.userFormConfig.data.organizationIds.push(this.orgTreeConfig.currentNodeData.id)
-//        this.$http.post(url, JSON.stringify(this.userFormConfig.data))
-//          .then((response) => {
-//            let res = response.data
-//            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
-//              this.$message.success(res.msg)
-//            } else {
-//              this.$message.error(res.msg)
-//            }
-//          }).catch(function (response) {
-//          console.log(response)
-//        })
+        this.$refs['userForm'].validate((valid) => {
+          if (valid) {
+            let formData = this.userFormConfig.data
+            let url
+            if (formData.id !== null && formData.id !== '') url = CONSTANT.API_URL.USER.UPDATE
+            else url = CONSTANT.API_URL.USER.SAVE
+            this.userFormConfig.data.organizationIds.push(this.orgTreeConfig.currentNodeData.id)
+            this.$http.post(url, JSON.stringify(this.userFormConfig.data))
+              .then((response) => {
+                let res = response.data
+                if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                  this.$message.success(res.msg)
+                } else {
+                  this.$message.error(res.msg)
+                }
+                // 关闭对话框
+                this.closeUserDialog()
+              }).catch(function (response) {
+              console.log(response)
+            })
+          } else {
+            return false
+          }
+        })
       },
       dataGrid_handleSizeChange (pageSize) {
         this.dataGridConfig.pageSize = pageSize
@@ -505,11 +504,12 @@
           this.getUserRoles()
         } else { // 修改
           // 查询用户详情
+          // 隐藏不能修改的输入框
           this.getUserRoles()
           this.getUserDetail(data.id)
         }
       },
-      userDialogClose () {
+      closeUserDialog () {
         // 清理dialog
         this.userFormConfig.data = JSON.parse(JSON.stringify(userFormInit))
         this.userDialogConfig.visible = false
@@ -561,14 +561,52 @@
           console.log(response)
         })
       },
-      validateForm (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!')
-          } else {
-            console.log('error submit!!')
-            return false
-          }
+      leave (id, postState) {
+        this.$confirm('确认修改?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 离职
+          this.$http.post(CONSTANT.API_URL.USER.LEAVE, {id: id, postState: postState}, {emulateJSON: true})
+            .then((response) => {
+              let res = response.data
+              if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                this.$message.success(res.msg)
+              } else {
+                this.$message.error(res.msg)
+              }
+              // 刷新分页
+              this.pageUsers()
+            }).catch(function (response) {
+            console.log(response)
+          })
+        }).catch(() => {
+
+        })
+      },
+      updateState (id, state) {
+        this.$confirm('确认修改?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 修改账户状态
+          this.$http.post(CONSTANT.API_URL.USER.UPDATE_STATE, {id: id, state: state}, {emulateJSON: true})
+            .then((response) => {
+              let res = response.data
+              if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                this.$message.success(res.msg)
+              } else {
+                this.$message.error(res.msg)
+              }
+              // 刷新分页
+              this.pageUsers()
+            }).catch(function (response) {
+            console.log(response)
+          })
+        }).catch(() => {
+
         })
       }
     },
