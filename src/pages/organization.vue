@@ -42,9 +42,9 @@
           <el-col :span="5">
             <el-col :span="8">账户状态</el-col>
             <el-col :span="16">
-              <el-select v-model="userQuery.state" placeholder="请选择">
+              <el-select v-model="userQuery.postState" placeholder="请选择">
                 <el-option
-                  v-for="item in useStateOption.options"
+                  v-for="item in userQueryConfig.postStateOption.options"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -57,7 +57,7 @@
             <el-col :span="16">
               <el-select v-model="userQuery.state" placeholder="请选择">
                 <el-option
-                  v-for="item in useStateOption.options"
+                  v-for="item in userQueryConfig.stateOption.options"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -79,11 +79,14 @@
             border
             :data="dataGridConfig.list"
             style="width: 100%">
+            <el-table-column prop="username" label="用户名"></el-table-column>
             <el-table-column prop="name" label="姓名"></el-table-column>
-            <el-table-column prop="sex" label="性别"></el-table-column>
+            <el-table-column prop="sex" label="性别" width="65" :formatter="dataGridConfig.formatter.sex"></el-table-column>
+            <el-table-column prop="state" label="账户状态" width="95" :formatter="dataGridConfig.formatter.state"></el-table-column>
+            <el-table-column prop="postState" label="在职情况" width="95" :formatter="dataGridConfig.formatter.postState"></el-table-column>
             <el-table-column prop="email" label="邮箱"></el-table-column>
             <el-table-column prop="phone" label="手机"></el-table-column>
-            <el-table-column label="操作">
+            <el-table-column label="操作" width="260">
               <template scope="scope">
                 <el-button
                   size="small"
@@ -402,6 +405,8 @@
                 }
                 // 关闭对话框
                 this.closeUserDialog()
+                // 刷新
+                this.pageUsers()
               }).catch(function (response) {
               console.log(response)
             })
@@ -525,7 +530,7 @@
               this.userFormConfig.data.id = data.id
               this.userFormConfig.data.nickName = data.nickName
               this.userFormConfig.data.postState = data.postState
-              this.userFormConfig.data.state = data.state
+              this.userFormConfig.data.state = null
               this.userFormConfig.data.organizationIds = data.organizations ? data.organizations.map(o => o.id) : []
               this.userFormConfig.data.roleIds = data.roles ? data.roles.map(r => r.id) : []
               this.userFormConfig.data.name = data.name
@@ -639,7 +644,8 @@
       return {
         test: '',
         activeName2: 'first',
-        useStateOption: {
+        userQueryConfig: {
+          stateOption: {
             value: '',
             options: [{
               value: null,
@@ -651,6 +657,20 @@
               value: 0,
               label: '禁用'
             }]
+          },
+          postStateOption: {
+            value: '',
+            options: [{
+              value: null,
+              label: '全部'
+            }, {
+              value: 1,
+              label: '启用'
+            }, {
+              value: 0,
+              label: '禁用'
+            }]
+          }
         },
         userDialogConfig: {
             visible: false,
@@ -776,6 +796,7 @@
           organizationId: null,
           state: null,
           keyword: null,
+          postState: null,
           pageNum: 1,
           pageSize: 10
         },
@@ -785,7 +806,22 @@
             pageNum: 1,
             pageNumInit: 1,
             pageSize: 10,
-            pageSizes: [10, 20, 30, 40]
+            pageSizes: [10, 20, 30, 40],
+            formatter: {
+                state (row, column) {
+                    if (row.state === 1) return '启用'
+                    else return '禁用'
+                },
+                postState (row, column) {
+                  if (row.postState === 1) return '在职'
+                  else return '离职'
+                },
+                sex (row, column) {
+                  if (row.sex === 0) return '未知'
+                  else if (row.sex === 1) return '男'
+                  else return '女'
+                }
+            }
         },
         organizationTabConfig: {
             activeName: 'first'
