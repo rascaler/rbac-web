@@ -1,8 +1,8 @@
 <style rel="stylesheet/less" lang="less">
-
+  @import "../styles/commons/common";
 </style>
 <template>
-<div id="roleContainer">
+<div id="roleContainer" class="row-mtb15">
   <el-row>
     <el-form :inline="true" :model="searchFormConfig.data" class="demo-form-inline">
       <el-form-item label="角色名">
@@ -20,6 +20,9 @@
       </el-form-item>
     </el-form>
   </el-row>
+  <el-row class="no-margin">
+    <el-button type="primary" @click="search">查询</el-button>
+  </el-row>
   <el-row>
     <el-table
       :data="dataGridConfig.list"
@@ -31,8 +34,8 @@
       <el-table-column prop="description" label="描述"></el-table-column>
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button size="small" @click="operation_detail">详情</el-button>
-          <el-button size="small" @click="operation_delete">删除</el-button>
+          <el-button size="small" @click="operation_detail(scope.$index, scope.row)">详情</el-button>
+          <el-button size="small" @click="operation_delete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -45,7 +48,11 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="dataGridConfig.paginationConfig.total">
     </el-pagination>
+
+    <!-- 添加修改对话框  -->
+    <!-- 查看详情对话框 -->
   </el-row>
+
 </div>
 </template>
 <script>
@@ -57,6 +64,10 @@
       pageSize: 10
   }
   export default {
+    name: 'role',
+    mounted () {
+      this.pageRoles()
+    },
     methods: {
       // >>>>>>>>>>>>>>>>>>searchFormConfig<<<<<<<<<<<<<<<<<<<<<<<<
       search () {
@@ -65,9 +76,19 @@
         this.pageRoles()
       },
       // >>>>>>>>>>>>>>>>>>dataGridConfig<<<<<<<<<<<<<<<<<<<<<<<<
-      operation_detail () {
+      operation_detail (index, row) {
       },
-      operation_delete () {
+      operation_delete (index, row) {
+        this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+            console.log(row)
+          this.$message.success('删除成功')
+        }).catch(() => {
+          this.$message.success('删除失败')
+        })
       },
       // >>>>>>>>>>>>>>>>>>paginationConfig<<<<<<<<<<<<<<<<<<<<<<<<
       // 改变每页显示条数触发
