@@ -13,13 +13,13 @@ Vue.use(ElementUI)
 Vue.use(VueResource)
 
 // 分环境配置
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'prod') {
   let API_URL = require('./router/ApiUrl').default
   buildUrl('http://localhost:9090/rbac/', API_URL)
   CONSTANT.API_URL = API_URL
 } else {
-  let API_URL = require('./router/ApiUrl').default
-  buildUrl('http://localhost:8888/rbac/', API_URL)
+  let API_URL = require('./router/devApiUrl').default
+  buildUrl('http://localhost:8888/', API_URL)
   CONSTANT.API_URL = API_URL
 }
 CONSTANT.ResponseCode = ResponseCode

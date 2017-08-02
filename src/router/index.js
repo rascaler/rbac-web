@@ -7,7 +7,7 @@ import test from '@/pages/test'
 import treeTest from '@/pages/test/treeTest'
 import formTest from '@/pages/test/formTest'
 import validateTest from '@/pages/test/validateTest'
-
+import role from '@/pages/role'
 Vue.use(Router)
 
 export default new Router({
@@ -46,6 +46,11 @@ export default new Router({
       path: '/validateTest',
       name: 'validateTest',
       component: validateTest
+    },
+    {
+      path: '/role',
+      name: 'role',
+      component: role
     }
   ]
 })

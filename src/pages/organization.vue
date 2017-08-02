@@ -615,7 +615,6 @@
         })
       }
     },
-
     data () {
       // userForm验证
       let validatePass = (rule, value, callback) => {

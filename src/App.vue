@@ -19,7 +19,7 @@
 
             <el-menu-item index="1-1"><router-link to="/example" style="display: block;width: 100%;text-decoration: none;color: black;">选项1</router-link></el-menu-item>
             <el-menu-item index="1-2"><router-link to="/organization" style="display: block;width: 100%;text-decoration: none;color: black;">组织</router-link></el-menu-item>
-            <el-menu-item index="1-2"><router-link to="/role" style="display: block;width: 100%;text-decoration: none;color: black;">角色</router-link></el-menu-item>
+            <el-menu-item index="1-3"><router-link to="/role" style="display: block;width: 100%;text-decoration: none;color: black;">角色</router-link></el-menu-item>
 
           </el-submenu>
           <el-submenu index="2">

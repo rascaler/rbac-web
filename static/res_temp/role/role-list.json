@@ -1,0 +1,87 @@
+{
+  "ecode": "1000",
+  "msg": "成功",
+  "data": {
+    "total": 30,
+    "list": [
+      {
+        "id" : 1,
+        "createdDate" : "2017-05-23 12:00:00",
+        "updatedDate" : "2017-06-23 17:43:00",
+        "name" : "管理员",
+        "state" : 1,
+        "description" : "管理员",
+        "enterpriseId" : 1,
+        "parentId" : 3,
+        "pidList" : "3,4"
+      },
+      {
+        "id" : 2,
+        "createdDate" : "2017-05-23 12:00:00",
+        "updatedDate" : "2017-06-23 17:41:13",
+        "name" : "超级管理员",
+        "state" : 1,
+        "description" : "超级管理员",
+        "enterpriseId" : 1,
+        "parentId" : 0,
+        "pidList" : null
+      },
+      {
+        "id" : 3,
+        "createdDate" : "2017-05-23 12:00:00",
+        "updatedDate" : "2017-06-23 17:43:00",
+        "name" : "研发部管理员",
+        "state" : 1,
+        "description" : "研发部管理员",
+        "enterpriseId" : 1,
+        "parentId" : 4,
+        "pidList" : "4"
+      },
+      {
+        "id" : 4,
+        "createdDate" : "2017-05-23 12:00:00",
+        "updatedDate" : "2017-05-23 12:00:00",
+        "name" : "研发部组长",
+        "state" : 1,
+        "description" : "研发部组长",
+        "enterpriseId" : 1,
+        "parentId" : 0,
+        "pidList" : null
+      },
+      {
+        "id" : 5,
+        "createdDate" : "2017-05-23 12:00:00",
+        "updatedDate" : "2017-06-23 17:43:00",
+        "name" : "运营部管理员",
+        "state" : 1,
+        "description" : "运营部管理员",
+        "enterpriseId" : 1,
+        "parentId" : 6,
+        "pidList" : "6"
+      },
+      {
+        "id" : 6,
+        "createdDate" : "2017-05-23 12:00:00",
+        "updatedDate" : "2017-05-23 12:00:00",
+        "name" : "运营部组长",
+        "state" : 1,
+        "description" : "运营部组长",
+        "enterpriseId" : 1,
+        "parentId" : 0,
+        "pidList" : null
+      },
+      {
+        "id" : 7,
+        "createdDate" : "2017-05-23 12:00:00",
+        "updatedDate" : "2017-05-23 12:00:00",
+        "name" : "基础部门管理",
+        "state" : 1,
+        "description" : "基础部门管理",
+        "enterpriseId" : 1,
+        "parentId" : 0,
+        "pidList" : null
+      }
+    ]
+  }
+}
+
