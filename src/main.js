@@ -11,9 +11,11 @@ import 'element-ui/lib/theme-default/index.css'
 
 Vue.use(ElementUI)
 Vue.use(VueResource)
+// mock dev prod
+const env = 'mock'
 
 // 分环境配置
-if (process.env.NODE_ENV === 'prod') {
+if (env === 'dev' || env === 'prod') {
   let API_URL = require('./router/ApiUrl').default
   buildUrl('http://localhost:9090/rbac/', API_URL)
   CONSTANT.API_URL = API_URL

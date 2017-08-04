@@ -1,0 +1,16 @@
+{
+  "ecode": "1000",
+  "msg": "成功",
+  "data": {
+            "id" : 1,
+            "createdDate" : "2017-05-23 12:00:00",
+            "updatedDate" : "2017-06-23 17:43:00",
+            "name" : "管理员",
+            "state" : 1,
+            "description" : "管理员",
+            "enterpriseId" : 1,
+            "parentId" : 3,
+            "pidList" : "3,4"
+         }
+}
+

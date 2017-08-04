@@ -35,7 +35,7 @@
       <el-table-column prop="description" label="描述"></el-table-column>
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button size="small" @click="operation_detail(scope.$index, scope.row)">详情</el-button>
+          <el-button size="small" @click="operation_detail(scope.$index, scope.row)">修改</el-button>
           <el-button size="small" @click="operation_updateState(scope.$index, scope.row)">启用</el-button>
           <el-button size="small" @click="operation_delete(scope.$index, scope.row)">删除</el-button>
         </template>
@@ -52,9 +52,9 @@
     </el-pagination>
 
     <!-- 添加修改对话框  -->
-    <el-dialog  :title="editDialogConfig.title" :visible.sync="editDialogConfig.visible" @close="closeEditDialog">
+    <el-dialog  :title="editDialogConfig.title" :visible.sync="editDialogConfig.visible" @close="closeEditDialog" size="tiny">
 
-      <el-form class="el-edit-form" :model="roleFormConfig.data" :rules="roleFormConfig.rules" ref="roleForm" :label-width="roleFormConfig.style.labelWidth">
+      <el-form :model="roleFormConfig.data" :rules="roleFormConfig.rules" ref="roleForm" :label-width="roleFormConfig.style.labelWidth">
         <el-form-item label="父角色" prop="parentId">
           <el-select clearable v-model="roleFormConfig.data.parentId" placeholder="请选择父角色">
             <el-option
@@ -70,6 +70,17 @@
         </el-form-item>
         <el-form-item label="描述" prop="description">
           <el-input type="textarea" v-model="roleFormConfig.data.description" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="权限" prop="privilegeIds">
+          <el-table
+            :data="privDataGridConfig.list"
+            border
+            @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="40">
+            </el-table-column>
+            <el-table-column prop="name" label="角色名" width="180"></el-table-column>
+            <el-table-column prop="description" label="描述"></el-table-column>
+          </el-table>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -95,7 +106,8 @@
       name: '',
       state: '',
       description: '',
-      parentId: ''
+      parentId: '',
+      privilegeIds: []
   }
   export default {
     name: 'role',
@@ -111,27 +123,108 @@
       },
       openEditDialog (type) {
         this.editDialogConfig.visible = true
+        this.getRoles()
+        this.getPrivileges()
         if (type === 'add') {
-            this.$message.success('添加')
+            this.editDialogConfig.title = '添加'
         } else {
-            this.$message.success('修改')
+            this.editDialogConfig.title = '修改'
         }
       },
       closeEditDialog () {
         // 重置表单
         this.editDialogConfig.visible = false
+        this.roleFormConfig.data = JSON.parse(JSON.stringify(roleFormInit))
       },
       roleSaveOrUpdate () {
 //        this.$loading({target: document.getElementById('editDialog')})
-        this.$message.success('保存成功')
+        let id = this.roleFormConfig.data.id
+        let url = id !== null && id !== '' ? CONSTANT.API_URL.ROLE.UPDATE : CONSTANT.API_URL.ROLE.SAVE
+        this.$http.post(url, JSON.stringify(this.roleFormConfig.data))
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                this.$message.success(res.msg)
+            } else {
+                this.$message.error(res.msg)
+            }
+          }).catch((response) => {
+            this.$message.error('保存失败')
+        })
         this.closeEditDialog()
+      },
+      getRoles () {
+          this.$http.get(CONSTANT.API_URL.ROLE.GET_ROLES, {
+              params: {id: 1}
+          }).then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              let options = []
+              for (let value of res.data) {
+                  options.push({
+                      label: value.name,
+                      value: value.id
+                  })
+              }
+              this.roleFormConfig.parentRole.options = options
+            }
+          }).catch((response) => {
+
+          })
+      },
+      getPrivileges () {
+          this.$http.get(CONSTANT.API_URL.PRIVILEGE.GET_PRIVILEGES, {
+            params: {id: 1}
+          }).then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              this.privDataGridConfig.list = res.data
+            }
+          }).catch((response) => {
+
+          })
+      },
+      handleSelectionChange (rows) {
+        let privIds = []
+        for (let row of rows) {
+          privIds.push(row.id)
+        }
+        this.roleFormConfig.data.privilegeIds = privIds
       },
       // >>>>>>>>>>>>>>>>>>dataGridConfig<<<<<<<<<<<<<<<<<<<<<<<<
       operation_detail (index, row) {
           this.openEditDialog('update')
+          // 查询详情
+          this.$http.get(CONSTANT.API_URL.ROLE.DETAIL, {
+              params: {id: row.id}
+          }).then((response) => {
+              let res = response.data
+              if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                  let roleFormData = this.roleFormConfig.data
+                  roleFormData.id = res.data.id
+                  roleFormData.name = res.data.name
+                  roleFormData.description = res.data.description
+                  roleFormData.parentId = res.data.parentId
+              } else {
+                  this.$message.error(res.msg)
+              }
+          }).catch((response) => {
+              this.$message.error('无法查询角色详情')
+          })
       },
       operation_updateState (index, row) {
-        this.$message.success('启用成功')
+          let state = 0
+          if (row.state === 0) state = 1
+          // todo get => post
+          this.$http.get(CONSTANT.API_URL.ROLE.UPDATE_STATE, {id: row.id, state: state}, {
+            emulateJSON: true
+          }).then((response) => {
+            let res = response.data
+            if (res.ecode === CONSTANT.ResponseCode.SUCCESS) this.$message.success(res.msg)
+            else this.$message.error(res.msg)
+          }).catch((response) => {
+            this.$message.error('修改失败')
+          })
       },
       operation_delete (index, row) {
         this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
@@ -141,8 +234,6 @@
         }).then(() => {
             console.log(row)
           this.$message.success('删除成功')
-        }).catch(() => {
-          this.$message.success('删除失败')
         })
       },
       // >>>>>>>>>>>>>>>>>>paginationConfig<<<<<<<<<<<<<<<<<<<<<<<<
@@ -169,6 +260,15 @@
       }
     },
     data () {
+      // 手机号码验证
+//      let validatePhone = (rule, value, callback) => {
+//        if (!(/^1[3|4|5|8][0-9]\d{8}$/.test(this.userFormConfig.data.phone))) {
+//          callback(new Error('手机号码不正确!'))
+//        } else {
+//          callback()
+//        }
+//      }
+
       return {
         searchFormConfig: {
           data: JSON.parse(JSON.stringify(searchFormInit))
@@ -197,14 +297,24 @@
         },
         roleFormConfig: {
            data: JSON.parse(JSON.stringify(roleFormInit)),
-           rules: null,
+           rules: {
+            name: [
+              { required: true, message: '请输入角色名', trigger: 'blur' }
+            ],
+            description: [
+              { required: true, message: '请输入角色描述', trigger: 'blur' }
+            ]
+           },
            style: {
-              labelWidth: '80px'
+              labelWidth: '70px'
            },
            parentRole: {
             default: 0,
             options: []
           }
+        },
+        privDataGridConfig: {
+            list: []
         }
 
       }
