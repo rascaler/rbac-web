@@ -13,7 +13,7 @@
         <el-select v-model="searchFormConfig.data.state">
           <el-option label="全部" value=""></el-option>
           <el-option label="启用" value="1"></el-option>
-          <el-option label="禁用" value="2"></el-option>
+          <el-option label="禁用" value="0"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -155,8 +155,7 @@
         this.closeEditDialog()
       },
       getRoles () {
-          this.$http.get(CONSTANT.API_URL.ROLE.GET_ROLES, {
-              params: {id: 1}
+          this.$http.get(CONSTANT.API_URL.ROLE.GET_ALL, {
           }).then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
