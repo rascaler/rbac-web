@@ -7,7 +7,8 @@ import treeTest from '@/pages/test/treeTest'
 import formTest from '@/pages/test/formTest'
 import validateTest from '@/pages/test/validateTest'
 import role from '@/pages/role'
-import sysInfo from '@/pages/sysInfo'
+// import sysInfo from '@/pages/sysInfo'
+import login from '@/pages/login'
 
 Vue.use(Router)
 
@@ -15,8 +16,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'sysInfo',
-      component: sysInfo
+      name: 'login',
+      component: login
     },
     {
       path: '/example',
