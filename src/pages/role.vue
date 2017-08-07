@@ -140,7 +140,8 @@
 //        this.$loading({target: document.getElementById('editDialog')})
         let id = this.roleFormConfig.data.id
         let url = id !== null && id !== '' ? CONSTANT.API_URL.ROLE.UPDATE : CONSTANT.API_URL.ROLE.SAVE
-        this.$http.post(url, JSON.stringify(this.roleFormConfig.data))
+        // todo get -> post
+        this.$http.get(url, JSON.stringify(this.roleFormConfig.data))
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
