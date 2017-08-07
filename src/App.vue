@@ -15,7 +15,7 @@
       <el-col :span="5">
         <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
           <el-submenu index="1">
-            <template slot="title"><i class="el-icon-message"></i>导航一</template>
+            <template slot="title"><i class="el-icon-message"></i>组织信息</template>
 
             <el-menu-item index="1-1"><router-link to="/example" style="display: block;width: 100%;text-decoration: none;color: black;">选项1</router-link></el-menu-item>
             <el-menu-item index="1-2"><router-link to="/organization" style="display: block;width: 100%;text-decoration: none;color: black;">组织</router-link></el-menu-item>
@@ -23,13 +23,13 @@
 
           </el-submenu>
           <el-submenu index="2">
-            <template slot="title"><i class="el-icon-menu"></i>导航二</template>
+            <template slot="title"><i class="el-icon-menu"></i>角色权限</template>
 
             <el-menu-item index="1-1"><router-link to="/test" style="display: block;width: 100%;text-decoration: none;color: black;">选项1</router-link></el-menu-item>
             <el-menu-item index="1-2"><router-link to="/test2" style="display: block;width: 100%;text-decoration: none;color: black;">选项2</router-link></el-menu-item>
 
           </el-submenu>
-          <el-menu-item index="3"><i class="el-icon-setting"></i>导航三</el-menu-item>
+          <el-menu-item index="3"><router-link to="/" style="display: block;width: 100%;text-decoration: none;color: black;"><i class="el-icon-setting"></i>系统设置</router-link></el-menu-item>
         </el-menu>
       </el-col>
       <el-col :span="19" style="border: 1px solid #dfe6ec;">

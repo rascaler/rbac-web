@@ -17,7 +17,13 @@ const API_URL = {
   ROLE: {
     GET_ALL: 'role/getAll',
     GET_ORGANIZATION_ROLES: 'role/getOrganizationRoles',
-    GET_USER_ROLES: 'role/getUserRoles'
+    GET_USER_ROLES: 'role/getUserRoles',
+    PAGE_ROLE: 'role/pageRoles',
+    GET_ROLES: 'role/getRoles',
+    UPDATE_STATE: 'role/updateState',
+    DETAIL: 'role/detail',
+    SAVE: 'role/save',
+    UPDATE: 'role/update'
   }
 }
 export default API_URL
