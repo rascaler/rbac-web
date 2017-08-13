@@ -21,9 +21,13 @@ const API_URL = {
     PAGE_ROLE: 'role/pageRoles',
     GET_ROLES: 'role/getRoles',
     UPDATE_STATE: 'role/updateState',
-    DETAIL: 'role/detail',
+    EDIT_DETAIL: 'role/editDetail',
     SAVE: 'role/save',
-    UPDATE: 'role/update'
+    UPDATE: 'role/update',
+    DELETE: 'role/delete'
+  },
+  PRIVILEGE: {
+    GET_PRIVILEGES: 'privilege/getPrivileges'
   }
 }
 export default API_URL

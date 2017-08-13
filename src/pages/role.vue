@@ -36,7 +36,7 @@
       <el-table-column label="操作">
         <template scope="scope">
           <el-button size="small" @click="operation_detail(scope.$index, scope.row)">修改</el-button>
-          <el-button size="small" @click="operation_updateState(scope.$index, scope.row)">启用</el-button>
+          <el-button size="small" @click="operation_updateState(scope.$index, scope.row)">{{scope.row.state === 0 ? '启用' : '禁用'}}</el-button>
           <el-button size="small" @click="operation_delete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -75,10 +75,11 @@
           <el-table
             :data="privDataGridConfig.list"
             border
+            ref="privDataGrid"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="40">
             </el-table-column>
-            <el-table-column prop="name" label="角色名" width="180"></el-table-column>
+            <el-table-column prop="name" label="权限名" width="180"></el-table-column>
             <el-table-column prop="description" label="描述"></el-table-column>
           </el-table>
         </el-form-item>
@@ -140,8 +141,7 @@
 //        this.$loading({target: document.getElementById('editDialog')})
         let id = this.roleFormConfig.data.id
         let url = id !== null && id !== '' ? CONSTANT.API_URL.ROLE.UPDATE : CONSTANT.API_URL.ROLE.SAVE
-        // todo get -> post
-        this.$http.get(url, JSON.stringify(this.roleFormConfig.data))
+        this.$http.post(url, JSON.stringify(this.roleFormConfig.data))
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -149,6 +149,8 @@
             } else {
                 this.$message.error(res.msg)
             }
+            // 刷新列表
+            this.pageRoles()
           }).catch((response) => {
             this.$message.error('保存失败')
         })
@@ -195,7 +197,7 @@
       operation_detail (index, row) {
           this.openEditDialog('update')
           // 查询详情
-          this.$http.get(CONSTANT.API_URL.ROLE.DETAIL, {
+          this.$http.get(CONSTANT.API_URL.ROLE.EDIT_DETAIL, {
               params: {id: row.id}
           }).then((response) => {
               let res = response.data
@@ -204,7 +206,10 @@
                   roleFormData.id = res.data.id
                   roleFormData.name = res.data.name
                   roleFormData.description = res.data.description
-                  roleFormData.parentId = res.data.parentId
+                  roleFormData.parentId = res.data.parentId ? res.data.parentId : null
+                  roleFormData.privilegeIds = res.data.privilegeIds
+                  // 权限选中
+//                  this.selectPrivilege(res.data.privilegeIds)
               } else {
                   this.$message.error(res.msg)
               }
@@ -212,16 +217,22 @@
               this.$message.error('无法查询角色详情')
           })
       },
+      selectPrivilege (privilegeIds) {
+//          for (var row of this.privDataGridConfig.list) {
+//            if (privilegeIds.find(privId => privId === row.id) > 0) this.$refs.privDataGrid.toggleRowSelection(row)
+//          }
+//        this.$refs.privDataGrid.toggleRowSelection(this.privDataGridConfig.list)
+      },
       operation_updateState (index, row) {
           let state = 0
           if (row.state === 0) state = 1
-          // todo get => post
-          this.$http.get(CONSTANT.API_URL.ROLE.UPDATE_STATE, {id: row.id, state: state}, {
+          this.$http.post(CONSTANT.API_URL.ROLE.UPDATE_STATE, {id: row.id, state: state}, {
             emulateJSON: true
           }).then((response) => {
             let res = response.data
             if (res.ecode === CONSTANT.ResponseCode.SUCCESS) this.$message.success(res.msg)
             else this.$message.error(res.msg)
+            this.pageRoles()
           }).catch((response) => {
             this.$message.error('修改失败')
           })
@@ -232,8 +243,17 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-            console.log(row)
-          this.$message.success('删除成功')
+            this.$http.post(CONSTANT.API_URL.ROLE.DELETE, {id: row.id}, {
+              emulateJSON: true
+            }).then((response) => {
+              let res = response.data
+              if (res.ecode === CONSTANT.ResponseCode.SUCCESS) this.$message.success(res.msg)
+              else this.$message.error(res.msg)
+              // 刷新列表
+              this.pageRoles()
+            }).catch((response) => {
+              this.$message.error('删除失败')
+            })
         })
       },
       // >>>>>>>>>>>>>>>>>>paginationConfig<<<<<<<<<<<<<<<<<<<<<<<<
