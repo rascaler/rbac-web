@@ -9,6 +9,7 @@ import validateTest from '@/pages/test/validateTest'
 import role from '@/pages/role'
 // import sysInfo from '@/pages/sysInfo'
 import login from '@/pages/login'
+import privilege from '@/pages/privilege'
 
 Vue.use(Router)
 
@@ -53,6 +54,11 @@ export default new Router({
       path: '/role',
       name: 'role',
       component: role
+    },
+    {
+      path: '/privilege',
+      name: 'privilege',
+      component: privilege
     }
   ]
 })

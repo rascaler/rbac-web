@@ -1,0 +1,75 @@
+{
+  "ecode": "1000",
+  "msg": "成功",
+  "data": {
+    "total": 30,
+    "list": [
+      {
+        "id" : 1,
+        "name" : "添加",
+        "description" : "添加",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      },
+      {
+        "id" : 2,
+        "name" : "删除",
+        "description" : "删除",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      },
+      {
+        "id" : 3,
+        "name" : "查询",
+        "description" : "查询",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      },
+      {
+        "id" : 4,
+        "name" : "查询",
+        "description" : "查询",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      },
+      {
+        "id" : 5,
+        "name" : "查询",
+        "description" : "查询",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      },
+      {
+        "id" : 6,
+        "name" : "查询",
+        "description" : "查询",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      },
+      {
+        "id" : 7,
+        "name" : "查询",
+        "description" : "查询",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      },
+      {
+        "id" : 8,
+        "name" : "查询",
+        "description" : "查询",
+        "createdDate" : "2017-08-04 15:00:00",
+        "updatedDate" : "2017-08-04 16:02:09",
+        "enterpriseId" : 1
+      }
+    ]
+  }
+
+}
+
