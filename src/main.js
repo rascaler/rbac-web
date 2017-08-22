@@ -12,7 +12,7 @@ import 'element-ui/lib/theme-default/index.css'
 Vue.use(ElementUI)
 Vue.use(VueResource)
 // mock dev prod
-const env = 'dev'
+const env = 'mock'
 
 // 分环境配置
 if (env === 'dev' || env === 'prod') {

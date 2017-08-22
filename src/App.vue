@@ -25,7 +25,7 @@
           <el-submenu index="2">
             <template slot="title"><i class="el-icon-menu"></i>角色权限</template>
 
-            <el-menu-item index="1-1"><router-link to="/test" style="display: block;width: 100%;text-decoration: none;color: black;">选项1</router-link></el-menu-item>
+            <el-menu-item index="1-1"><router-link to="/privilege" style="display: block;width: 100%;text-decoration: none;color: black;">权限</router-link></el-menu-item>
             <el-menu-item index="1-2"><router-link to="/test2" style="display: block;width: 100%;text-decoration: none;color: black;">选项2</router-link></el-menu-item>
 
           </el-submenu>

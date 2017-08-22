@@ -15,7 +15,10 @@ const API_URL = {
     UPDATE: 'static/res_temp/common/success.json'
   },
   PRIVILEGE: {
-    GET_PRIVILEGES: 'static/res_temp/privilege/priv-list.json'
+    GET_PRIVILEGES: 'static/res_temp/privilege/priv-list.json',
+    PAGE_PRIVILEGE: 'static/res_temp/privilege/page-priv-list.json',
+    DELETE: 'static/res_temp/common/success.json',
+    UPDATE_STATE: 'static/res_temp/common/success.json'
   }
 }
 export default API_URL

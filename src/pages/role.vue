@@ -5,7 +5,7 @@
 <template>
 <div id="roleContainer" class="row-mtb15">
   <el-row>
-    <el-form :inline="true" :model="searchFormConfig.data" class="demo-form-inline">
+    <el-form :inline="true" :model="searchFormConfig.data">
       <el-form-item label="角色名">
         <el-input v-model="searchFormConfig.data.name" placeholder="请输入角色名"></el-input>
       </el-form-item>
