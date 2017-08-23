@@ -136,6 +136,7 @@
         // 重置表单
         this.editDialogConfig.visible = false
         this.roleFormConfig.data = JSON.parse(JSON.stringify(roleFormInit))
+        this.privDataGridConfig.list = []
       },
       roleSaveOrUpdate () {
 //        this.$loading({target: document.getElementById('editDialog')})
@@ -182,9 +183,26 @@
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
               this.privDataGridConfig.list = res.data
             }
+          }).then((response) => {
+            // 存在渲染延迟，表格未重新渲染完成执行该代码可能会无效导致不选中checkbox
+            this.selectPrivileges()
           }).catch((response) => {
 
           })
+      },
+      selectPrivileges () {
+        let privList = this.privDataGridConfig.list
+        let rolePriv = this.roleFormConfig.data.privilegeIds
+        if (privList !== null && privList.length > 0 && rolePriv !== null && rolePriv.length > 0) {
+          this.privDataGridConfig.list.forEach(row => {
+              for (let rp of rolePriv) {
+                if (rp === row.id) {
+                  this.$refs.privDataGrid.toggleRowSelection(row, true)
+                  break
+                }
+              }
+          })
+        }
       },
       handleSelectionChange (rows) {
         let privIds = []
@@ -208,8 +226,9 @@
                   roleFormData.description = res.data.description
                   roleFormData.parentId = res.data.parentId ? res.data.parentId : null
                   roleFormData.privilegeIds = res.data.privilegeIds
-                  // 权限选中
-//                  this.selectPrivilege(res.data.privilegeIds)
+                  // 设置选中 如果在表格加载前完成，就不设置选中，由表格加载后重新设置选中，防止异步问题
+                  let privList = this.privDataGridConfig.list
+                  if (privList != null && privList.length > 0) this.selectPrivileges()
               } else {
                   this.$message.error(res.msg)
               }
@@ -217,15 +236,18 @@
               this.$message.error('无法查询角色详情')
           })
       },
-      selectPrivilege (privilegeIds) {
-//          for (var row of this.privDataGridConfig.list) {
-//            if (privilegeIds.find(privId => privId === row.id) > 0) this.$refs.privDataGrid.toggleRowSelection(row)
-//          }
-//        this.$refs.privDataGrid.toggleRowSelection(this.privDataGridConfig.list)
-      },
       operation_updateState (index, row) {
-          let state = 0
-          if (row.state === 0) state = 1
+        let state = 0
+        let text = '禁用'
+        if (row.state === 0) {
+          state = 1
+          text = '启用'
+        }
+        this.$confirm('确认' + text + '该角色?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
           this.$http.post(CONSTANT.API_URL.ROLE.UPDATE_STATE, {id: row.id, state: state}, {
             emulateJSON: true
           }).then((response) => {
@@ -236,6 +258,7 @@
           }).catch((response) => {
             this.$message.error('修改失败')
           })
+        })
       },
       operation_delete (index, row) {
         this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
