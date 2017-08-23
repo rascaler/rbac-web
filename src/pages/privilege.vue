@@ -16,6 +16,9 @@
         </el-form-item>
       </el-form>
     </el-row>
+    <el-row class="no-margin">
+      <el-button type="primary" @click="openEditDialog('add')">添加</el-button>
+    </el-row>
     <el-row>
       <el-table ref="dataGrid" border :data="dataGridConfig.list">
         <el-table-column label="权限名" prop="name"></el-table-column>
@@ -48,6 +51,33 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="dataGridConfig.paginationConfig.total">
       </el-pagination>
+
+      <!-- 添加修改对话框  -->
+      <el-dialog  :title="editDialogConfig.title" :visible.sync="editDialogConfig.visible" @close="closeEditDialog" size="tiny">
+
+        <el-form :model="privilegeFormConfig.data" :rules="privilegeFormConfig.rules" ref="privilegeForm" :label-width="privilegeFormConfig.style.labelWidth">
+          <el-form-item label="权限名" prop="name">
+            <el-input v-model="privilegeFormConfig.data.name" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="权限编码" prop="code">
+            <el-input v-model="privilegeFormConfig.data.code" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="描述" prop="description">
+            <el-input type="textarea" v-model="privilegeFormConfig.data.description" auto-complete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="closeEditDialog">取 消</el-button>
+          <el-button type="primary" @click="privilegeSaveOrUpdate">确 定</el-button>
+        </div>
+      </el-dialog>
+
+      <el-table ref="menuDataGrid" border :data="menuDataGridConfig.list">
+        <el-table-column label="系统" prop="name"></el-table-column>
+        <el-table-column label="模块" prop="modules"></el-table-column>
+        <el-table-column label="菜单" prop="modules"></el-table-column>
+      </el-table>
+
     </el-row>
   </div>
 </template>
@@ -57,10 +87,18 @@
     code: '',
     name: ''
   }
+
+  const privilegeFormInit = {
+    name: '',
+    code: '',
+    description: ''
+  }
+
   export default {
     name: 'privilege',
     mounted () {
       this.pagePrivileges()
+      this.getMenus()
     },
     methods: {
       search () {
@@ -79,6 +117,7 @@
           })
       },
       operation_detail (index, row) {
+          this.$router.push('/formTest')
       },
       operation_delete (index, row) {
         this.$confirm('此操作将永久删除该权限, 是否继续?', '提示', {
@@ -126,6 +165,42 @@
       handleCurrentChange (pageNum) {
         this.searchFormConfig.data.pageNum = this.dataGridConfig.paginationConfig.pageNum
         this.pagePrivileges()
+      },
+      openEditDialog (type) {
+        this.editDialogConfig.visible = true
+      },
+      closeEditDialog () {
+          // 重置表单
+          this.editDialogConfig.visible = false
+          this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
+      },
+      privilegeSaveOrUpdate () {
+        let id = this.privilegeFormConfig.data.id
+        let url = id !== null && id !== '' ? CONSTANT.API_URL.PRIVILEGE.UPDATE : CONSTANT.API_URL.PRIVILEGE.SAVE
+        // todo get -> post
+        this.$http.get(url, JSON.stringify(this.privilegeFormConfig.data))
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              this.$message.success(res.msg)
+            } else {
+              this.$message.error(res.msg)
+            }
+            // 刷新列表
+            this.pagePrivileges()
+          }).catch((response) => {
+          this.$message.error('保存失败')
+        })
+        this.closeEditDialog()
+      },
+      getMenus () {
+        this.$http.get(CONSTANT.API_URL.MENU.GET_MENUS)
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              this.menuDataGridConfig.list = res.data
+            }
+          })
       }
     },
     data () {
@@ -150,6 +225,21 @@
             total: 0,
             currentPage: 1
           }
+        },
+        editDialogConfig: {
+          title: '编辑',
+          visible: false
+        },
+        privilegeFormConfig: {
+          data: JSON.parse(JSON.stringify(privilegeFormInit)),
+          rules: {
+          },
+          style: {
+            labelWidth: '70px'
+          }
+        },
+        menuDataGridConfig: {
+          list: []
         }
       }
     }

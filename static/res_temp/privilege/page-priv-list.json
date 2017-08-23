@@ -10,7 +10,9 @@
         "description" : "添加",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       },
       {
         "id" : 2,
@@ -18,7 +20,9 @@
         "description" : "删除",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       },
       {
         "id" : 3,
@@ -26,7 +30,9 @@
         "description" : "查询",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       },
       {
         "id" : 4,
@@ -34,7 +40,9 @@
         "description" : "查询",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       },
       {
         "id" : 5,
@@ -42,7 +50,9 @@
         "description" : "查询",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       },
       {
         "id" : 6,
@@ -50,7 +60,9 @@
         "description" : "查询",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       },
       {
         "id" : 7,
@@ -58,7 +70,9 @@
         "description" : "查询",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       },
       {
         "id" : 8,
@@ -66,7 +80,9 @@
         "description" : "查询",
         "createdDate" : "2017-08-04 15:00:00",
         "updatedDate" : "2017-08-04 16:02:09",
-        "enterpriseId" : 1
+        "enterpriseId" : 1,
+        "state": 1,
+        "code": "add"
       }
     ]
   }

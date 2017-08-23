@@ -1,0 +1,36 @@
+{
+  "ecode": "1000",
+  "msg": "成功",
+  "data": [
+    {
+      "id" : 1,
+      "sysName" : "rbac管理系统",
+      "modules" : [{
+          "name" : "组织管理"
+        },{
+          "name" : "组织管理"
+        },{
+          "name" : "系统信息"
+        }
+      ]
+    },
+    {
+      "id" : 2,
+      "name" : "删除",
+      "description" : "删除",
+      "createdDate" : "2017-08-04 15:00:00",
+      "updatedDate" : "2017-08-04 16:02:09",
+      "enterpriseId" : 1
+    },
+    {
+      "id" : 3,
+      "name" : "查询",
+      "description" : "查询",
+      "createdDate" : "2017-08-04 15:00:00",
+      "updatedDate" : "2017-08-04 16:02:09",
+      "enterpriseId" : 1
+    }
+  ]
+
+}
+

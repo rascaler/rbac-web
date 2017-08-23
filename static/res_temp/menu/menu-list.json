@@ -1,0 +1,73 @@
+{
+  "ecode": "1000",
+  "msg": "成功",
+  "data": [
+    {
+      "id": 1,
+      "name" : "rbac管理系统",
+      "modules" : [{
+          "id" : 1,
+          "name" : "组织模块",
+          "menus": [{
+            "key" : "menu1",
+            "name": "组织管理",
+            "children": [{
+              "key" : "operation1",
+              "id": 1,
+              "name": "添加组织",
+              "children" : null
+            },{
+              "key" : "operation2",
+              "id": 2,
+              "name": "删除组织",
+              "children" : null
+            }]
+          },{
+            "key" : "menu2",
+            "name": "用户管理",
+            "children": [{
+              "key" : "operation3",
+              "id": 3,
+              "name": "添加用户",
+              "children" : null
+            },{
+              "key" : "operation4",
+              "id": 4,
+              "name": "删除用户",
+              "children" : null
+            }]
+          }]
+      },{
+        "id" : 2,
+        "name" : "角色权限模块",
+        "menus": [{
+          "key" : "menu3",
+          "name": "角色管理",
+          "children": [{
+            "key" : "operation5",
+            "name": "添加角色",
+            "children" : null
+          },{
+            "key" : "operation6",
+            "name": "删除角色",
+            "children" : null
+          }]
+        },{
+          "key" : "menu4",
+          "name": "权限管理",
+          "children": [{
+            "key" : "operation7",
+            "name": "添加权限",
+            "children" : null
+          },{
+            "key" : "operation8",
+            "name": "删除权限",
+            "children" : null
+          }]
+        }]
+      }]
+    }
+  ]
+
+}
+
