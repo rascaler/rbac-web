@@ -7,6 +7,7 @@ import treeTest from '@/pages/test/treeTest'
 import formTest from '@/pages/test/formTest'
 import validateTest from '@/pages/test/validateTest'
 import role from '@/pages/role'
+import tableTest2 from '@/pages/test/tableTest2'
 // import sysInfo from '@/pages/sysInfo'
 import login from '@/pages/login'
 import tableTest from '@/pages/test/tableTest'
@@ -60,6 +61,11 @@ export default new Router({
       path: '/tableTest',
       name: 'tableTest',
       component: tableTest
+    },
+    {
+      path: '/tableTest2',
+      name: 'tableTest2',
+      component: tableTest2
     },
     {
       path: '/privilege',

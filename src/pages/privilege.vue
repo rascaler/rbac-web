@@ -65,19 +65,32 @@
           <el-form-item label="描述" prop="description">
             <el-input type="textarea" v-model="privilegeFormConfig.data.description" auto-complete="off"></el-input>
           </el-form-item>
+          <el-form-item label="应用" prop="appId">
+            <el-select v-model="privilegeFormConfig.data.appId"  @change="appChange">
+              <el-option
+                v-for="item in appOption.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <div>
+            <el-tree
+              ref="menuTree"
+              :data="menuTreeConfig.data"
+              show-checkbox
+              default-expand-all
+              highlight-current
+              :props="menuTreeConfig.prop">
+            </el-tree>
+          </div>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="closeEditDialog">取 消</el-button>
           <el-button type="primary" @click="privilegeSaveOrUpdate">确 定</el-button>
         </div>
       </el-dialog>
-
-      <el-table ref="menuDataGrid" border :data="menuDataGridConfig.list">
-        <el-table-column label="系统" prop="name"></el-table-column>
-        <el-table-column label="模块" prop="modules"></el-table-column>
-        <el-table-column label="菜单" prop="modules"></el-table-column>
-      </el-table>
-
     </el-row>
   </div>
 </template>
@@ -91,7 +104,8 @@
   const privilegeFormInit = {
     name: '',
     code: '',
-    description: ''
+    description: '',
+    appId: ''
   }
 
   export default {
@@ -194,11 +208,14 @@
         this.closeEditDialog()
       },
       getMenus () {
-        this.$http.get(CONSTANT.API_URL.MENU.GET_MENUS)
+
+      },
+      appChange (appId) {
+        this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS)
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
-              this.menuDataGridConfig.list = res.data
+              this.menuTreeConfig.data = res.data
             }
           })
       }
@@ -240,6 +257,20 @@
         },
         menuDataGridConfig: {
           list: []
+        },
+        menuTreeConfig: {
+          data: [],
+          prop: {
+            label: 'name',
+            children: 'children'
+          }
+        },
+        appOption: {
+          value: '',
+          options: [{
+            value: 1,
+            label: 'rbac后台'
+          }]
         }
       }
     }

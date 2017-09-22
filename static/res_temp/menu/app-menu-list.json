@@ -1,0 +1,41 @@
+{
+  "ecode": "1000",
+  "msg": "成功",
+  "datas": [
+    {
+      "id": 1,
+      "appName": "组织",
+      "menus": [
+        {
+          "id": 1,
+          "name": "组织管理",
+          "children": [
+            {
+              "id": 1,
+              "name": "组织列表",
+              "children": [
+                {
+                  "id": 1,
+                  "name": "查询",
+                  "isMenu": false
+                },
+                {
+                  "id": 2,
+                  "name": "编辑",
+                  "isMenu": false
+                },
+                {
+                  "id": 3,
+                  "name": "删除",
+                  "isMenu": false
+                }
+              ]
+            }
+          ],
+          "privileges": null
+        }
+      ]
+    }
+  ]
+}
+

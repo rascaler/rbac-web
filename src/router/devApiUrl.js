@@ -23,7 +23,7 @@ const API_URL = {
     SAVE: 'static/res_temp/common/success.json'
   },
   MENU: {
-    GET_MENUS: 'static/res_temp/menu/menu-list.json'
+    GET_APP_MENUS: 'static/res_temp/menu/menu-tree.json'
   }
 }
 export default API_URL
