@@ -87,7 +87,7 @@
           </div>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="closeEditDialog">取 消</el-button>
+          <el-button @click="editDialogConfig.visible = false">取 消</el-button>
           <el-button type="primary" @click="privilegeSaveOrUpdate">确 定</el-button>
         </div>
       </el-dialog>
@@ -105,7 +105,9 @@
     name: '',
     code: '',
     description: '',
-    appId: ''
+    appId: '',
+    operationIds: [],
+    menuIds: []
   }
 
   export default {
@@ -186,7 +188,9 @@
       closeEditDialog () {
           // 重置表单
           this.editDialogConfig.visible = false
-          this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
+          this.menuTreeConfig.data = []
+          this.$refs['privilegeForm'].resetFields()
+//          this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
       },
       privilegeSaveOrUpdate () {
         let id = this.privilegeFormConfig.data.id
@@ -211,6 +215,7 @@
 
       },
       appChange (appId) {
+        if (appId === null || appId === '') return
         this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS)
           .then((response) => {
             let res = response.data
@@ -254,9 +259,6 @@
           style: {
             labelWidth: '70px'
           }
-        },
-        menuDataGridConfig: {
-          list: []
         },
         menuTreeConfig: {
           data: [],
