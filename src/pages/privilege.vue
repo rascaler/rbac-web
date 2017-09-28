@@ -184,12 +184,14 @@
       },
       openEditDialog (type) {
         this.editDialogConfig.visible = true
+        this.getApps()
       },
       closeEditDialog () {
           // 重置表单
           this.editDialogConfig.visible = false
           this.menuTreeConfig.data = []
           this.$refs['privilegeForm'].resetFields()
+          this.appOption.options = []
 //          this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
       },
       privilegeSaveOrUpdate () {
@@ -216,7 +218,7 @@
       },
       appChange (appId) {
         if (appId === null || appId === '') return
-        this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS)
+        this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS, {params: {appId: appId}})
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -225,16 +227,30 @@
           })
       },
       getApps () {
-        this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS)
+        this.$http.get(CONSTANT.API_URL.APP.GET_APPS)
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
-              this.menuTreeConfig.data = res.data
+                if (res.data === null) return
+                  res.data.forEach(i => {
+                    this.appOption.options.push({
+                      value: i.id,
+                      label: i.name
+                    })
+                  })
             }
           })
       }
     },
     data () {
+      // 信息验证
+//      let validatePhone = (rule, value, callback) => {
+//        if (!(/^1[3|4|5|8][0-9]\d{8}$/.test(this.userFormConfig.data.phone))) {
+//          callback(new Error('手机号码不正确!'))
+//        } else {
+//          callback()
+//        }
+//      }
       return {
         searchFormConfig: {
           data: JSON.parse(JSON.stringify(searchFormInit))
@@ -278,10 +294,7 @@
         },
         appOption: {
           value: '',
-          options: [{
-            value: 1,
-            label: 'rbac后台'
-          }]
+          options: []
         }
       }
     }

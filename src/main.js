@@ -6,6 +6,7 @@ import router from './router'
 import VueResource from 'vue-resource'
 import ElementUI from 'element-ui'
 import ResponseCode from './commons/ResponseCode'
+import Validator from './commons/validator'
 import CONSTANT from './commons/constant'
 import 'element-ui/lib/theme-default/index.css'
 
@@ -25,6 +26,7 @@ if (env === 'dev' || env === 'prod') {
   CONSTANT.API_URL = API_URL
 }
 CONSTANT.ResponseCode = ResponseCode
+CONSTANT.Validator = Validator
 
 Vue.config.productionTip = false
 
