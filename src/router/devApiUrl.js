@@ -24,6 +24,9 @@ const API_URL = {
   },
   MENU: {
     GET_APP_MENUS: 'static/res_temp/menu/menu-tree.json'
+  },
+  APP: {
+    GET_APPS: 'static/res_temp/app/app-list.json'
   }
 }
 export default API_URL

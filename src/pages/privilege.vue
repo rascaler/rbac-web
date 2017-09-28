@@ -223,6 +223,15 @@
               this.menuTreeConfig.data = res.data
             }
           })
+      },
+      getApps () {
+        this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS)
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              this.menuTreeConfig.data = res.data
+            }
+          })
       }
     },
     data () {
