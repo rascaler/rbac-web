@@ -102,6 +102,7 @@
   }
 
   const privilegeFormInit = {
+    id: '',
     name: '',
     code: '',
     description: '',
@@ -159,7 +160,7 @@
         let state = 0
         if (row.state === 0) state = 1
         // todo get -> post
-        this.$http.get(CONSTANT.API_URL.PRIVILEGE.UPDATE_STATE, {id: row.id, state: state}, {
+        this.$http.post(CONSTANT.API_URL.PRIVILEGE.UPDATE_STATE, {id: row.id, state: state}, {
           emulateJSON: true
         }).then((response) => {
           let res = response.data
@@ -192,26 +193,38 @@
           this.menuTreeConfig.data = []
           this.$refs['privilegeForm'].resetFields()
           this.appOption.options = []
-//          this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
+          this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
       },
       privilegeSaveOrUpdate () {
-        let id = this.privilegeFormConfig.data.id
-        let url = id !== null && id !== '' ? CONSTANT.API_URL.PRIVILEGE.UPDATE : CONSTANT.API_URL.PRIVILEGE.SAVE
-        // todo get -> post
-        this.$http.get(url, JSON.stringify(this.privilegeFormConfig.data))
-          .then((response) => {
-            let res = response.data
-            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
-              this.$message.success(res.msg)
-            } else {
-              this.$message.error(res.msg)
-            }
-            // 刷新列表
-            this.pagePrivileges()
-          }).catch((response) => {
-          this.$message.error('保存失败')
+        this.$refs['privilegeForm'].validate((valid) => {
+          if (valid) {
+            let id = this.privilegeFormConfig.data.id
+            // 获取选中节点
+            let nodes = this.$refs.menuTree.getCheckedNodes()
+            nodes.forEach(n => {
+                if (n.isMenu) this.privilegeFormConfig.data.menuIds.push(n.id)
+                else this.privilegeFormConfig.data.operationIds.push(n.id)
+            })
+            let url = id !== null && id !== '' ? CONSTANT.API_URL.PRIVILEGE.UPDATE : CONSTANT.API_URL.PRIVILEGE.SAVE
+            // todo get -> post
+            this.$http.get(url, JSON.stringify(this.privilegeFormConfig.data))
+              .then((response) => {
+                let res = response.data
+                if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                  this.$message.success(res.msg)
+                } else {
+                  this.$message.error(res.msg)
+                }
+                // 刷新列表
+                this.pagePrivileges()
+              }).catch((response) => {
+              this.$message.error('保存失败')
+            })
+            this.closeEditDialog()
+          } else {
+            return false
+          }
         })
-        this.closeEditDialog()
       },
       getMenus () {
 
@@ -227,7 +240,7 @@
           })
       },
       getApps () {
-        this.$http.get(CONSTANT.API_URL.APP.GET_APPS)
+        this.$http.get(CONSTANT.API_URL.APP.GET_ALL)
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -244,13 +257,16 @@
     },
     data () {
       // 信息验证
-//      let validatePhone = (rule, value, callback) => {
-//        if (!(/^1[3|4|5|8][0-9]\d{8}$/.test(this.userFormConfig.data.phone))) {
-//          callback(new Error('手机号码不正确!'))
-//        } else {
-//          callback()
-//        }
-//      }
+      let validatePrivilegeIds = (rule, value, callback) => {
+        let operationIds = this.privilegeFormConfig.data.menuIds
+        let appId = this.privilegeFormConfig.data.appId
+        if (appId === null || appId === '') callback(new Error('请选择应用!'))
+        if (operationIds === null || operationIds.length === 0) {
+          callback(new Error('请选择菜单!'))
+        } else {
+          callback()
+        }
+      }
       return {
         searchFormConfig: {
           data: JSON.parse(JSON.stringify(searchFormInit))
@@ -280,6 +296,19 @@
         privilegeFormConfig: {
           data: JSON.parse(JSON.stringify(privilegeFormInit)),
           rules: {
+            name: [
+              { required: true, message: '请输入权限名', trigger: 'blur' }
+            ],
+            code: [
+              { required: true, message: '请输入权限编码', trigger: 'blur' }
+            ],
+            description: [
+              { required: true, message: '请输入权限描述', trigger: 'blur' }
+            ],
+            appId: [
+//              { required: true, message: '请选择应用', trigger: 'blur' },
+              { validator: validatePrivilegeIds, trigger: 'blur' }
+            ]
           },
           style: {
             labelWidth: '70px'

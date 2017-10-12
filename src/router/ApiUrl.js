@@ -28,6 +28,12 @@ const API_URL = {
   },
   PRIVILEGE: {
     GET_PRIVILEGES: 'privilege/getPrivileges'
+  },
+  MENU: {
+    GET_APP_MENUS: 'menu/getAppMenus'
+  },
+  APP: {
+    GET_ALL: 'app/getAll'
   }
 }
 export default API_URL
