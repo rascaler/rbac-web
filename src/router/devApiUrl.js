@@ -20,7 +20,8 @@ const API_URL = {
     DELETE: 'static/res_temp/common/success.json',
     UPDATE_STATE: 'static/res_temp/common/success.json',
     UPDATE: 'static/res_temp/common/success.json',
-    SAVE: 'static/res_temp/common/success.json'
+    SAVE: 'static/res_temp/common/success.json',
+    GET_DETAIL: 'static/res_temp/privilege/priv-detail.json'
   },
   MENU: {
     GET_APP_MENUS: 'static/res_temp/menu/menu-tree.json'

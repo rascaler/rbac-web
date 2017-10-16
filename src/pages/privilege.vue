@@ -134,7 +134,26 @@
           })
       },
       operation_detail (index, row) {
-          this.$router.push('/formTest')
+        this.$http.get(CONSTANT.API_URL.PRIVILEGE.GET_DETAIL, {params: {id: row.id}})
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              if (res.data === null) return
+              // 获取详情未表单赋值
+              let privData = this.privilegeFormConfig.data
+              privData.id = res.data.id
+              privData.name = res.data.id
+              privData.code = res.data.code
+              privData.description = res.data.description
+              privData.appId = res.data.appId
+              privData.operationIds = res.data.operationIds
+              privData.menuIds = res.data.menuIds
+              // 打开对话框
+              this.openEditDialog('update')
+              // 刷新权限所拥有的菜单
+              this.refreshPrivMenus()
+            }
+          })
       },
       operation_delete (index, row) {
         this.$confirm('此操作将永久删除该权限, 是否继续?', '提示', {
@@ -196,15 +215,16 @@
           this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
       },
       privilegeSaveOrUpdate () {
+        // 获取选中节点
+        let nodes = this.$refs.menuTree.getCheckedNodes()
+        nodes.forEach(n => {
+          if (n.isMenu) this.privilegeFormConfig.data.menuIds.push(n.id)
+          else this.privilegeFormConfig.data.operationIds.push(n.id)
+        })
         this.$refs['privilegeForm'].validate((valid) => {
           if (valid) {
+            // 获取选中菜单和操作id
             let id = this.privilegeFormConfig.data.id
-            // 获取选中节点
-            let nodes = this.$refs.menuTree.getCheckedNodes()
-            nodes.forEach(n => {
-                if (n.isMenu) this.privilegeFormConfig.data.menuIds.push(n.id)
-                else this.privilegeFormConfig.data.operationIds.push(n.id)
-            })
             let url = id !== null && id !== '' ? CONSTANT.API_URL.PRIVILEGE.UPDATE : CONSTANT.API_URL.PRIVILEGE.SAVE
             // todo get -> post
             this.$http.get(url, JSON.stringify(this.privilegeFormConfig.data))
@@ -253,15 +273,25 @@
                   })
             }
           })
+      },
+      refreshPrivMenus () {
+        let formMenuIds = this.privilegeFormConfig.data.menuIds
+        let formOperationIds = this.privilegeFormConfig.data.operationIds
+        let gridList = this.menuTreeConfig.data
+        if (formMenuIds != null && formMenuIds.length > 0 &&
+            gridList !== null && gridList.length > 0) {
+            this.$refs.menuTree.setCheckedKeys(formMenuIds) // 菜单选中
+            this.$refs.menuTree.setCheckedKeys(formOperationIds) // 操作选中
+        }
       }
     },
     data () {
       // 信息验证
       let validatePrivilegeIds = (rule, value, callback) => {
-        let operationIds = this.privilegeFormConfig.data.menuIds
+        let menuIds = this.privilegeFormConfig.data.menuIds
         let appId = this.privilegeFormConfig.data.appId
         if (appId === null || appId === '') callback(new Error('请选择应用!'))
-        if (operationIds === null || operationIds.length === 0) {
+        if (menuIds === null || menuIds.length === 0) {
           callback(new Error('请选择菜单!'))
         } else {
           callback()

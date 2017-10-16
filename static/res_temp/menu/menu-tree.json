@@ -5,23 +5,25 @@
     {
       "id": 1,
       "name": "组织管理",
+      "isMenu": true,
       "children": [
         {
-          "id": 1,
+          "id": 2,
           "name": "组织列表",
+          "isMenu": true,
           "children": [
             {
-              "id": 1,
+              "id": 3,
               "name": "查询",
               "isMenu": false
             },
             {
-              "id": 2,
+              "id": 4,
               "name": "编辑",
               "isMenu": false
             },
             {
-              "id": 3,
+              "id": 5,
               "name": "删除",
               "isMenu": false
             }

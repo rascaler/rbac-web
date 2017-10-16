@@ -9,10 +9,12 @@
         {
           "id": 1,
           "name": "组织管理",
+          "isMenu": true,
           "children": [
             {
               "id": 1,
               "name": "组织列表",
+              "isMenu": true,
               "children": [
                 {
                   "id": 1,
@@ -31,8 +33,7 @@
                 }
               ]
             }
-          ],
-          "privileges": null
+          ]
         }
       ]
     }
