@@ -30,7 +30,8 @@ const API_URL = {
     GET_PRIVILEGES: 'privilege/getPrivileges'
   },
   MENU: {
-    GET_APP_MENUS: 'menu/getAppMenus'
+    GET_APP_MENUS: 'menu/getAppMenus',
+    GET_MENU_TREE: 'menu/getMenuTree'
   },
   APP: {
     GET_ALL: 'app/getAll'

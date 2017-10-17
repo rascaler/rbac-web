@@ -66,7 +66,7 @@
             <el-input type="textarea" v-model="privilegeFormConfig.data.description" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="应用" prop="appId">
-            <el-select v-model="privilegeFormConfig.data.appId"  @change="appChange">
+            <el-select v-model="privilegeFormConfig.data.appId">
               <el-option
                 v-for="item in appOption.options"
                 :key="item.value"
@@ -82,6 +82,7 @@
               show-checkbox
               default-expand-all
               highlight-current
+              node-key="id"
               :props="menuTreeConfig.prop">
             </el-tree>
           </div>
@@ -117,6 +118,28 @@
       this.pagePrivileges()
       this.getMenus()
     },
+    watch: {
+        'privilegeFormConfig.data.appId': {
+          handler (newVal, oldVal) {
+            this.appChange(newVal)
+          },
+          deep: true
+        },
+        'menuTreeConfig.data': {
+          handler (newVal, oldVal) {
+            let menuIds = this.privilegeFormConfig.data.menuIds
+            if (newVal !== null && newVal.length > 0 && menuIds !== null && menuIds.length > 0) this.refreshPrivMenus()
+          },
+          deep: true
+        },
+        'privilegeFormConfig.data.menuIds': {
+          handler (newVal, oldVal) {
+            let treeData = this.menuTreeConfig.data
+            if (newVal !== null && newVal.length > 0 && treeData !== null && treeData.length > 0) this.refreshPrivMenus()
+          },
+          deep: true
+        }
+    },
     methods: {
       search () {
         this.searchFormConfig.data.pageNum = this.dataGridConfig.paginationConfig.pageNum
@@ -150,8 +173,6 @@
               privData.menuIds = res.data.menuIds
               // 打开对话框
               this.openEditDialog('update')
-              // 刷新权限所拥有的菜单
-              this.refreshPrivMenus()
             }
           })
       },

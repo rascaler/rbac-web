@@ -5,13 +5,13 @@
     {
       "id" : 1,
       "name" : "添加",
-      "code": "code",
+      "code": "add",
       "description" : "添加",
       "createdDate" : "2017-08-04 15:00:00",
       "updatedDate" : "2017-08-04 16:02:09",
       "enterpriseId" : 1,
       "menuIds": [1,2],
-      "operationIds": [3],
+      "operationIds": [4],
       "appId": 1
     }
 }

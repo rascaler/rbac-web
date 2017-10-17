@@ -24,7 +24,8 @@ const API_URL = {
     GET_DETAIL: 'static/res_temp/privilege/priv-detail.json'
   },
   MENU: {
-    GET_APP_MENUS: 'static/res_temp/menu/menu-tree.json'
+    GET_APP_MENUS: 'static/res_temp/menu/menu-tree.json',
+    PAGE_MENUS: 'static/res_temp/menu/menu-list.json'
   },
   APP: {
     GET_ALL: 'static/res_temp/app/app-list.json'
