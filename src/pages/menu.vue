@@ -39,11 +39,11 @@
                      :current-node-key="menuTreeConfig.currentKey"
                      node-key="id"
                      :default-expanded-keys = "menuTreeConfig.expandedKeys"
-                     :filter-node-method="orgTreeConfig_filterNode"
-                     @node-click="orgTreeConfig_handleNodeClick"
+                     :filter-node-method="menuTreeConfig_filterNode"
+                     @node-click="menuTreeConfig_handleNodeClick"
                      ref="menuTree"
                      :expand-on-click-node="false"
-                     :render-content="orgTreeConfig_renderContent">
+                     :render-content="menuTreeConfig_renderContent">
             </el-tree>
           </div>
         </el-row>
@@ -114,6 +114,10 @@
         <el-form-item label="编码" prop="code">
           <el-input v-model="menuFormConfig.data.code" auto-complete="off"></el-input>
         </el-form-item>
+        <el-form-item label="图标" prop="icon" >
+          <el-input v-model="menuFormConfig.data.icon" auto-complete="off" style="display: inline-block;width: 90%;"></el-input>
+          <i class="el-icon-setting" style="display: inline-block"></i>
+        </el-form-item>
         <el-form-item label="路由" prop="url">
           <el-input v-model="menuFormConfig.data.url" auto-complete="off"></el-input>
         </el-form-item>
@@ -144,6 +148,7 @@
     id: '',
     name: '',
     code: '',
+    icon: '',
     sequence: '',
     url: '',
     appId: '',
@@ -181,7 +186,7 @@
           })
       },
       // >>>>>>>>>>>>>>>>>>orgTreeConfig<<<<<<<<<<<<<<<<<<<<<<
-      orgTreeConfig_filterNode (value, data) {
+      menuTreeConfig_filterNode (value, data) {
         if (!value) return true
         return data.name.indexOf(value) !== -1
       },
@@ -196,18 +201,15 @@
           console.log(response)
         })
       },
-      orgTreeConfig_handleNodeClick (data) {
-        this.userQuery.organizationId = data.id
-        this.orgTreeConfig.currentNodeData = data
-        this.dataGridConfig.pageNum = this.dataGridConfig.pageNumInit
+      menuTreeConfig_handleNodeClick (data) {
         // 查询
-        this.pageUsers()
+        this.pageMenus()
       },
       orgTreeConfig_operatorShow (e, data) {
         e.stopPropagation()
         this.menuTreeConfig.nodeId = data.id
       },
-      orgTreeConfig_renderContent (h, { node, data, store }) {
+      menuTreeConfig_renderContent (h, { node, data, store }) {
         return (
           <span>
           <span>{data.name}</span>
