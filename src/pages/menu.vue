@@ -28,7 +28,7 @@
           </el-select>
         </el-row>
         <el-row>
-          <el-input placeholder="菜单名" v-model="menuTreeConfig.filterText"></el-input>
+          <el-input placeholder="搜索" v-model="menuTreeConfig.filterText"></el-input>
         </el-row>
         <el-row>
           <div class="tree-container">
@@ -130,7 +130,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editDialogConfig.visible = false">取 消</el-button>
-        <el-button type="primary" >确 定</el-button>
+        <el-button type="primary" @click="menuSaveOrUpdate">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -173,7 +173,9 @@
     },
     methods: {
       search () {
-
+        this.searchFormConfig.data.pageNum = this.dataGridConfig.paginationConfig.pageNum
+        this.searchFormConfig.data.pageSize = this.dataGridConfig.paginationConfig.pageSize
+        this.pageMenus()
       },
       pageMenus () {
         this.$http.get(CONSTANT.API_URL.MENU.PAGE_MENUS, {params: this.searchFormConfig.data})
@@ -269,6 +271,35 @@
       },
       closeEditDialog () {
         this.editDialogConfig.visible = false
+        // 重置表单
+        this.$refs.menuForm.resetFields()
+      },
+      menuSaveOrUpdate () {
+        this.$refs['menuForm'].validate((valid) => {
+          if (valid) {
+            // 获取选中菜单和操作id
+            let id = this.menuFormConfig.data.id
+            let url = id !== null && id !== '' ? CONSTANT.API_URL.MENU.UPDATE : CONSTANT.API_URL.MENU.SAVE
+            // todo get -> post
+            this.$http.get(url, JSON.stringify(this.menuFormConfig.data))
+              .then((response) => {
+                let res = response.data
+                if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                  this.$message.success(res.msg)
+                  // 刷新树菜单
+                  this.pageMenus()
+                } else {
+                  this.$message.error(res.msg)
+                }
+                // 将新节点加入
+              }).catch((response) => {
+              this.$message.error('保存失败')
+            })
+            this.closeEditDialog()
+          } else {
+            return false
+          }
+        })
       }
     },
     data () {
@@ -328,7 +359,8 @@
                   value: 0,
                   label: '操作'
               }]
-          }
+          },
+          rules: {}
         }
       }
     }

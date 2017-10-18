@@ -25,7 +25,9 @@ const API_URL = {
   },
   MENU: {
     GET_APP_MENUS: 'static/res_temp/menu/menu-tree.json',
-    PAGE_MENUS: 'static/res_temp/menu/menu-list.json'
+    PAGE_MENUS: 'static/res_temp/menu/menu-list.json',
+    SAVE: 'static/res_temp/menu/menu-edit.json',
+    UPDATE: 'static/res_temp/menu/menu-edit.json'
   },
   APP: {
     GET_ALL: 'static/res_temp/app/app-list.json'

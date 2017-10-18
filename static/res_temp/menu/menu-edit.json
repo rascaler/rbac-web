@@ -1,0 +1,13 @@
+{
+  "ecode": "1000",
+  "msg": "成功",
+  "data":
+  {
+    "id": 6,
+    "name": "组织管理1",
+    "isMenu": false,
+    "parentId": 2,
+    "children": []
+  }
+}
+

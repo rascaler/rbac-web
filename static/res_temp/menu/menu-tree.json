@@ -6,26 +6,31 @@
       "id": 1,
       "name": "组织管理",
       "isMenu": true,
+      "parentId": 0,
       "children": [
         {
           "id": 2,
           "name": "组织列表",
           "isMenu": true,
+          "parentId": 1,
           "children": [
             {
               "id": 3,
               "name": "查询",
-              "isMenu": false
+              "isMenu": false,
+              "parentId": 2
             },
             {
               "id": 4,
               "name": "编辑",
-              "isMenu": false
+              "isMenu": false,
+              "parentId": 2
             },
             {
               "id": 5,
               "name": "删除",
-              "isMenu": false
+              "isMenu": false,
+              "parentId": 2
             }
           ]
         }
