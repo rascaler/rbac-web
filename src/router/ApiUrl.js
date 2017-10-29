@@ -27,11 +27,19 @@ const API_URL = {
     DELETE: 'role/delete'
   },
   PRIVILEGE: {
-    GET_PRIVILEGES: 'privilege/getPrivileges'
+    GET_PRIVILEGES: 'privilege/getPrivileges',
+    PAGE_PRIVILEGES: 'privilege/pagePrivileges',
+    SAVE: 'privilege/save',
+    UPDATE: 'privilege/update',
+    DELETE: 'privilege/delete'
   },
   MENU: {
     GET_APP_MENUS: 'menu/getAppMenus',
-    GET_MENU_TREE: 'menu/getMenuTree'
+    GET_MENU_TREE: 'menu/getMenuTree',
+    PAGE_MENUS: 'menu/pageMenus',
+    SAVE: 'menu/save',
+    UPDATE: 'menu/update',
+    REMOVE: 'menu/remove'
   },
   APP: {
     GET_ALL: 'app/getAll'

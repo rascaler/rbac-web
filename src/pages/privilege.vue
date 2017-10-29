@@ -108,15 +108,13 @@
     code: '',
     description: '',
     appId: '',
-    operationIds: [],
     menuIds: []
   }
 
   export default {
     name: 'privilege',
     mounted () {
-      this.pagePrivileges()
-      this.getMenus()
+      this.search()
     },
     watch: {
         'privilegeFormConfig.data.appId': {
@@ -147,7 +145,7 @@
         this.pagePrivileges()
       },
       pagePrivileges () {
-        this.$http.get(CONSTANT.API_URL.PRIVILEGE.PAGE_PRIVILEGE, {params: this.searchFormConfig.data})
+        this.$http.get(CONSTANT.API_URL.PRIVILEGE.PAGE_PRIVILEGES, {params: this.searchFormConfig.data})
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -169,7 +167,6 @@
               privData.code = res.data.code
               privData.description = res.data.description
               privData.appId = res.data.appId
-              privData.operationIds = res.data.operationIds
               privData.menuIds = res.data.menuIds
               // 打开对话框
               this.openEditDialog('update')
@@ -182,8 +179,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // todo get -> post
-          this.$http.get(CONSTANT.API_URL.PRIVILEGE.DELETE, {id: row.id}, {
+          this.$http.post(CONSTANT.API_URL.PRIVILEGE.DELETE, {id: row.id}, {
             emulateJSON: true
           }).then((response) => {
             let res = response.data
@@ -238,17 +234,13 @@
       privilegeSaveOrUpdate () {
         // 获取选中节点
         let nodes = this.$refs.menuTree.getCheckedNodes()
-        nodes.forEach(n => {
-          if (n.isMenu) this.privilegeFormConfig.data.menuIds.push(n.id)
-          else this.privilegeFormConfig.data.operationIds.push(n.id)
-        })
+        nodes.forEach(n => this.privilegeFormConfig.data.menuIds.push(n.id))
         this.$refs['privilegeForm'].validate((valid) => {
           if (valid) {
             // 获取选中菜单和操作id
             let id = this.privilegeFormConfig.data.id
             let url = id !== null && id !== '' ? CONSTANT.API_URL.PRIVILEGE.UPDATE : CONSTANT.API_URL.PRIVILEGE.SAVE
-            // todo get -> post
-            this.$http.get(url, JSON.stringify(this.privilegeFormConfig.data))
+            this.$http.post(url, JSON.stringify(this.privilegeFormConfig.data))
               .then((response) => {
                 let res = response.data
                 if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -272,7 +264,7 @@
       },
       appChange (appId) {
         if (appId === null || appId === '') return
-        this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS, {params: {appId: appId}})
+        this.$http.get(CONSTANT.API_URL.MENU.GET_MENU_TREE, {params: {appId: appId}})
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -297,12 +289,10 @@
       },
       refreshPrivMenus () {
         let formMenuIds = this.privilegeFormConfig.data.menuIds
-        let formOperationIds = this.privilegeFormConfig.data.operationIds
         let gridList = this.menuTreeConfig.data
         if (formMenuIds != null && formMenuIds.length > 0 &&
             gridList !== null && gridList.length > 0) {
             this.$refs.menuTree.setCheckedKeys(formMenuIds) // 菜单选中
-            this.$refs.menuTree.setCheckedKeys(formOperationIds) // 操作选中
         }
       }
     },

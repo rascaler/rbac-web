@@ -15,7 +15,7 @@
     <el-row :gutter="15">
       <el-col class="row-mtb15" :span="5">
         <el-row>
-          <el-button type="primary" icon="plus" @click="openEditDialog('add')" style="width: 100% "></el-button>
+          <el-button type="primary" icon="plus" @click="openEditDialog(event, null, 'add')" style="width: 100% "></el-button>
         </el-row>
         <el-row>
           <el-select v-model="menuTreeConfig.appId" placeholder="请选择应用" style="width: 100%">
@@ -72,7 +72,7 @@
             <el-table-column prop="name" label="菜单名"></el-table-column>
             <el-table-column prop="code" label="编码"></el-table-column>
             <el-table-column prop="url" label="路由" ></el-table-column>
-            <el-table-column prop="parentId" label="父节点" ></el-table-column>
+            <el-table-column prop="parentId" label="上级菜单" ></el-table-column>
             <el-table-column prop="type" label="类型"></el-table-column>
             <el-table-column prop="description" label="描述"></el-table-column>
           </el-table>
@@ -95,8 +95,9 @@
     <!-- 添加菜单对话框-->
     <el-dialog  :title="editDialogConfig.title" :visible.sync="editDialogConfig.visible" @close="closeEditDialog" size="tiny">
       <el-form :model="menuFormConfig.data" :rules="menuFormConfig.rules" ref="menuForm" :label-width="menuFormConfig.style.labelWidth">
-        <el-form-item label="父节点" prop="parentId">
-          <el-input v-model="menuFormConfig.data.parentId" auto-complete="off"></el-input>
+        <el-form-item label="上级菜单" prop="parentId" :style="{display:(menuFormConfig.data.parentId === '' ? 'none' : 'block')}">
+          {{menuFormConfig.data.parentName}}
+          <el-input style="display: none;" v-model="menuFormConfig.data.parentId" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型" prop="type">
           <el-select v-model="menuFormConfig.data.type" placeholder="请选择菜单类型">
@@ -153,20 +154,29 @@
     url: '',
     appId: '',
     parentId: '',
-    type: 1,
-    description: ''
+    type: 0,
+    description: '',
+    parentName: ''
   }
 
   export default {
     name: 'menu',
     mounted () {
       this.menuTreeConfig_initData()
-      this.pageMenus()
+      this.search()
     },
     watch: {
       'menuTreeConfig.filterText': {
         handler (newVal, oldVal) {
           this.$refs['menuTree'].filter(newVal)
+        },
+        deep: true
+      },
+      'menuTreeConfig.appId': {
+        handler (newVal, oldVal) {
+          // 先清理列表
+          this.menuTreeConfig.data = []
+          this.menuTreeConfig_initData(newVal)
         },
         deep: true
       }
@@ -192,8 +202,9 @@
         if (!value) return true
         return data.name.indexOf(value) !== -1
       },
-      menuTreeConfig_initData () {
-        this.$http.get(CONSTANT.API_URL.MENU.GET_APP_MENUS, {
+      menuTreeConfig_initData (appId) {
+        this.$http.get(CONSTANT.API_URL.MENU.GET_MENU_TREE, {
+            params: {appId: appId}
         }).then((response) => {
           let res = response.data
           if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -218,11 +229,12 @@
         <span class="el-tree-node__label tree-operator-container">
           <i class="el-icon-setting" on-click={ (e) => this.orgTreeConfig_operatorShow(e, data) }></i>
         <ul class={'el-dropdown-menu ' + (this.menuTreeConfig.nodeId === data.id ? 'show' : 'hide')} on-click={ (e) => e.stopPropagation() } on-mouseleave={ () => { this.menuTreeConfig.nodeId = null } }>
-      <li class="el-dropdown-menu__item node" on-click={ (e) => this.organizationDialogOpen(e, data) }>
-      <i class="el-icon-plus"></i> &nbsp;添加子菜单</li>
-        <li class="el-dropdown-menu__item" on-click={ (e) => this.getOrganizationDetail(e, data) }><i class="el-icon-edit"></i> &nbsp;修改</li>
-        <li class="el-dropdown-menu__item" on-click={ (e) => this.removeConfirm(e, store, data) }><i class="el-icon-delete"></i> &nbsp;删除</li>
-        <li class="el-dropdown-menu__item el-dropdown-menu__item--divided is-disabled is-divided" >&nbsp;ID: {data.id}</li>
+          <li class="el-dropdown-menu__item node" on-click={ (e) => this.openEditDialog(e, data, 'add') }>
+            <i class="el-icon-plus"></i> &nbsp;添加子菜单
+          </li>
+          <li class="el-dropdown-menu__item" on-click={ (e) => this.openEditDialog(e, data, 'update') }><i class="el-icon-edit"></i> &nbsp;修改</li>
+          <li class="el-dropdown-menu__item" on-click={ (e) => this.removeConfirm(e, store, data) }><i class="el-icon-delete"></i> &nbsp;删除</li>
+          <li class="el-dropdown-menu__item el-dropdown-menu__item--divided is-disabled is-divided" >&nbsp;ID: {data.id}</li>
         </ul>
         </span>
         </span>
@@ -239,25 +251,29 @@
         this.pageMenus()
       },
       removeConfirm (e, store, data) {
-        this.$confirm('此操作将永久删除该组织, 是否继续?', '提示', {
+        this.$confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.removeOrganziaton(e, store, data)
+          this.removeMenu(e, store, data)
         }).catch(() => {
 
         })
       },
-      removeOrganziaton (e, store, data) {
-        this.$http.post(CONSTANT.API_URL.ORGANIZATION.REMOVE, {id: data.id}, {
+      removeMenu (e, store, data) {
+        let parentId = data.parentId
+        this.$http.post(CONSTANT.API_URL.MENU.REMOVE, {id: data.id}, {
           emulateJSON: true
         }).then((response) => {
           let res = response.data
           if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
             this.$message.success(res.msg)
             // 刷新组织树，并选中被删除的组织的父节点
-            this.orgTreeConfig_initData()
+            this.menuTreeConfig_initData(this.menuTreeConfig.appId)
+            if (data && data.parentId !== 0) this.menuTreeConfig.expandedKeys = [parentId]
+            // 刷新分页列表
+            this.pageMenus()
           } else {
             this.$message.error(res.msg)
           }
@@ -266,7 +282,13 @@
           if (res) this.$message.error(res.msg)
         })
       },
-      openEditDialog (type) {
+      openEditDialog (e, data, type) {
+        // 初始化表单
+        if (data) {
+          this.menuFormConfig.data.parentId = data.id
+          this.menuFormConfig.data.parentName = data.name
+        }
+        if (type === 'add') this.menuFormConfig.data.appId = this.menuTreeConfig.appId
         this.editDialogConfig.visible = true
       },
       closeEditDialog () {
@@ -280,13 +302,15 @@
             // 获取选中菜单和操作id
             let id = this.menuFormConfig.data.id
             let url = id !== null && id !== '' ? CONSTANT.API_URL.MENU.UPDATE : CONSTANT.API_URL.MENU.SAVE
-            // todo get -> post
-            this.$http.get(url, JSON.stringify(this.menuFormConfig.data))
+            this.$http.post(url, this.menuFormConfig.data, {emulateJSON: true})
               .then((response) => {
                 let res = response.data
                 if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
                   this.$message.success(res.msg)
                   // 刷新树菜单
+                  this.menuTreeConfig_initData(this.menuTreeConfig.appId)
+                  // 选中刷新的菜单
+                  this.menuTreeConfig.expandedKeys = [res.data.id]
                   this.pageMenus()
                 } else {
                   this.$message.error(res.msg)
@@ -353,10 +377,10 @@
           },
           typeOption: {
               options: [{
-                  value: 1,
+                  value: 0,
                   label: '菜单'
               }, {
-                  value: 0,
+                  value: 1,
                   label: '操作'
               }]
           },
