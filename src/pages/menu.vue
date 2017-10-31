@@ -289,6 +289,7 @@
           this.menuFormConfig.data.parentName = data.name
         }
         if (type === 'add') this.menuFormConfig.data.appId = this.menuTreeConfig.appId
+        else this.getEditDetail(data.id)
         this.editDialogConfig.visible = true
       },
       closeEditDialog () {
@@ -324,6 +325,29 @@
             return false
           }
         })
+      },
+      getEditDetail (id) {
+          this.$http.get(CONSTANT.API_URL.MENU.GET_EDIT_DETAIL, {
+              params: {id: id}
+          }).then((response) => {
+              let res = response.data
+              if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+                  let formData = this.menuFormConfig.data
+                  formData.id = res.data.id
+                  formData.parentId = res.data.prarentId
+                  formData.name = res.data.name
+                  formData.code = res.data.code
+                  formData.url = res.data.url
+                  formData.sequence = res.data.sequence
+                  formData.type = res.data.type
+                  formData.description = res.data.description
+                  formData.icon = res.data.icon
+              } else {
+                this.$message.error(res.msg)
+            }
+          }).catch((response) => {
+            this.$message.error('查询失败')
+          })
       }
     },
     data () {
@@ -367,7 +391,7 @@
           data: JSON.parse(JSON.stringify(searchFormInit))
         },
         editDialogConfig: {
-           visible: true,
+           visible: false,
            title: '编辑 '
         },
         menuFormConfig: {

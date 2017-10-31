@@ -26,8 +26,11 @@ const API_URL = {
   MENU: {
     GET_APP_MENUS: 'static/res_temp/menu/menu-tree.json',
     PAGE_MENUS: 'static/res_temp/menu/menu-list.json',
-    SAVE: 'static/res_temp/menu/menu-edit.json',
-    UPDATE: 'static/res_temp/menu/menu-edit.json'
+    SAVE: 'static/res_temp/common/success.json',
+    UPDATE: 'static/res_temp/common/success.json',
+    GET_MENU_TREE: 'menu/getMenuTree',
+    REMOVE: 'static/res_temp/common/success.json',
+    GET_EDIT_DETAIL: 'menu/getEditDetail'
   },
   APP: {
     GET_ALL: 'static/res_temp/app/app-list.json'

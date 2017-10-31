@@ -39,7 +39,8 @@ const API_URL = {
     PAGE_MENUS: 'menu/pageMenus',
     SAVE: 'menu/save',
     UPDATE: 'menu/update',
-    REMOVE: 'menu/remove'
+    REMOVE: 'menu/remove',
+    GET_EDIT_DETAIL: 'menu/getEditDetail'
   },
   APP: {
     GET_ALL: 'app/getAll'
