@@ -31,7 +31,8 @@ const API_URL = {
     PAGE_PRIVILEGES: 'privilege/pagePrivileges',
     SAVE: 'privilege/save',
     UPDATE: 'privilege/update',
-    DELETE: 'privilege/delete'
+    DELETE: 'privilege/delete',
+    GET_EDIT_DETAIL: 'privilege/getEditDetail'
   },
   MENU: {
     GET_APP_MENUS: 'menu/getAppMenus',

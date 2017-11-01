@@ -155,7 +155,7 @@
           })
       },
       operation_detail (index, row) {
-        this.$http.get(CONSTANT.API_URL.PRIVILEGE.GET_DETAIL, {params: {id: row.id}})
+        this.$http.get(CONSTANT.API_URL.PRIVILEGE.GET_EDIT_DETAIL, {params: {id: row.id}})
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -168,6 +168,7 @@
               privData.description = res.data.description
               privData.appId = res.data.appId
               privData.menuIds = res.data.menuIds
+              privData.description = res.data.description
               // 打开对话框
               this.openEditDialog('update')
             }
