@@ -163,11 +163,11 @@
               // 获取详情未表单赋值
               let privData = this.privilegeFormConfig.data
               privData.id = res.data.id
-              privData.name = res.data.id
+              privData.name = res.data.name
               privData.code = res.data.code
               privData.description = res.data.description
               privData.appId = res.data.appId
-              privData.menuIds = res.data.menuIds
+              privData.menuIds = res.data.menuIds === null ? [] : res.data.menuIds
               privData.description = res.data.description
               // 打开对话框
               this.openEditDialog('update')
@@ -234,8 +234,11 @@
       },
       privilegeSaveOrUpdate () {
         // 获取选中节点
-        let nodes = this.$refs.menuTree.getCheckedNodes()
-        nodes.forEach(n => this.privilegeFormConfig.data.menuIds.push(n.id))
+        let nodes = this.$refs.menuTree.getCheckedNodes(false)
+        console.log(this.$refs.menuTree.getCheckedKeys(false))
+        let checkedMenus = []
+        nodes.forEach(n => checkedMenus.push(n.id))
+        this.privilegeFormConfig.data.menuIds = checkedMenus
         this.$refs['privilegeForm'].validate((valid) => {
           if (valid) {
             // 获取选中菜单和操作id
@@ -259,9 +262,6 @@
             return false
           }
         })
-      },
-      getMenus () {
-
       },
       appChange (appId) {
         if (appId === null || appId === '') return
@@ -296,6 +296,24 @@
             this.$refs.menuTree.setCheckedKeys(formMenuIds) // 菜单选中
         }
       }
+//      ,
+//      handleCheckChange (data, checked, indeterminate) {
+//        console.log(data, checked, indeterminate)
+//        let menuIds = this.privilegeFormConfig.data.menuIds
+//        if (checked) menuIds.push(data.id)
+//        else {
+//            let index = 0
+//            while (index < menuIds.length) {
+//                if (data.id === menuIds[index]) {
+//                    menuIds.splice(index, 1)
+//                    break
+//                } else {
+//                    index++
+//                }
+//            }
+//        }
+//        console.log(menuIds)
+//      }
     },
     data () {
       // 信息验证
