@@ -77,12 +77,14 @@
           </el-form-item>
           <div>
             <el-tree
+              id="menuTree"
               ref="menuTree"
               :data="menuTreeConfig.data"
               show-checkbox
               default-expand-all
               highlight-current
               node-key="id"
+              :render-content="orgTreeConfig_renderContent"
               :props="menuTreeConfig.prop">
             </el-tree>
           </div>
@@ -108,7 +110,8 @@
     code: '',
     description: '',
     appId: '',
-    menuIds: []
+    menuIds: [],
+    relaMenuIds: []
   }
 
   export default {
@@ -127,13 +130,6 @@
           handler (newVal, oldVal) {
             let menuIds = this.privilegeFormConfig.data.menuIds
             if (newVal !== null && newVal.length > 0 && menuIds !== null && menuIds.length > 0) this.refreshPrivMenus()
-          },
-          deep: true
-        },
-        'privilegeFormConfig.data.menuIds': {
-          handler (newVal, oldVal) {
-            let treeData = this.menuTreeConfig.data
-            if (newVal !== null && newVal.length > 0 && treeData !== null && treeData.length > 0) this.refreshPrivMenus()
           },
           deep: true
         }
@@ -168,8 +164,10 @@
               privData.description = res.data.description
               privData.appId = res.data.appId
               privData.menuIds = res.data.menuIds === null ? [] : res.data.menuIds
+              privData.relaMenuIds = res.data.relaMenuIds === null ? [] : res.data.relaMenuIds
               privData.description = res.data.description
               // 打开对话框
+              this.refreshPrivMenus()
               this.openEditDialog('update')
             }
           })
@@ -234,11 +232,15 @@
       },
       privilegeSaveOrUpdate () {
         // 获取选中节点
-        let nodes = this.$refs.menuTree.getCheckedNodes(false)
-        console.log(this.$refs.menuTree.getCheckedKeys(false))
-        let checkedMenus = []
-        nodes.forEach(n => checkedMenus.push(n.id))
-        this.privilegeFormConfig.data.menuIds = checkedMenus
+        this.privilegeFormConfig.data.menuIds = this.$refs.menuTree.getCheckedKeys()
+        // 获取选中节点的父节点
+        let indeterminateNodes = document.getElementById('menuTree').querySelectorAll('.is-indeterminate')
+        if (indeterminateNodes !== null && indeterminateNodes.length > 0) {
+          indeterminateNodes.forEach(n => {
+              let val = n.parentNode.nextElementSibling.querySelectorAll('.indeterminate-id')[0].innerText
+              this.privilegeFormConfig.data.relaMenuIds.push(Number(val))
+          })
+        }
         this.$refs['privilegeForm'].validate((valid) => {
           if (valid) {
             // 获取选中菜单和操作id
@@ -270,6 +272,7 @@
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
               this.menuTreeConfig.data = res.data
+              this.refreshPrivMenus()
             }
           })
       },
@@ -295,25 +298,24 @@
             gridList !== null && gridList.length > 0) {
             this.$refs.menuTree.setCheckedKeys(formMenuIds) // 菜单选中
         }
+      },
+      getParentIds (node, arr, all) {
+          if (node.parentId === 0) arr.add(node.id)
+          else {
+              arr.add(node.id)
+              // 查询节点
+              let parents = all.filter(n => n.id === node.parentId)
+              if (parents !== null && parents.length > 0) this.getParentIds(parents[0], arr, all)
+          }
+      },
+      orgTreeConfig_renderContent (h, { node, data, store }) {
+        return (
+            <span>
+              <span>{data.name}</span>
+              <span class="indeterminate-id" style="display:none;">{data.id}</span>
+            </span>
+        )
       }
-//      ,
-//      handleCheckChange (data, checked, indeterminate) {
-//        console.log(data, checked, indeterminate)
-//        let menuIds = this.privilegeFormConfig.data.menuIds
-//        if (checked) menuIds.push(data.id)
-//        else {
-//            let index = 0
-//            while (index < menuIds.length) {
-//                if (data.id === menuIds[index]) {
-//                    menuIds.splice(index, 1)
-//                    break
-//                } else {
-//                    index++
-//                }
-//            }
-//        }
-//        console.log(menuIds)
-//      }
     },
     data () {
       // 信息验证
