@@ -229,18 +229,23 @@
           this.$refs['privilegeForm'].resetFields()
           this.appOption.options = []
           this.privilegeFormConfig.data = JSON.parse(JSON.stringify(privilegeFormInit))
+          // 清空选中
+          this.$refs.menuTree.setCheckedKeys([])
       },
       privilegeSaveOrUpdate () {
         // 获取选中节点
         this.privilegeFormConfig.data.menuIds = this.$refs.menuTree.getCheckedKeys()
         // 获取选中节点的父节点
         let indeterminateNodes = document.getElementById('menuTree').querySelectorAll('.is-indeterminate')
+        let relaMenuIds = new Set()
         if (indeterminateNodes !== null && indeterminateNodes.length > 0) {
           indeterminateNodes.forEach(n => {
               let val = n.parentNode.nextElementSibling.querySelectorAll('.indeterminate-id')[0].innerText
-              this.privilegeFormConfig.data.relaMenuIds.push(Number(val))
+              relaMenuIds.add(Number(val))
           })
         }
+
+        this.privilegeFormConfig.data.relaMenuIds = Array.from(relaMenuIds)
         this.$refs['privilegeForm'].validate((valid) => {
           if (valid) {
             // 获取选中菜单和操作id
