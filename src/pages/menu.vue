@@ -52,6 +52,16 @@
         <!-- 搜索栏-->
         <el-row>
           <el-form ref="searchForm" :inline="true" :model="searchFormConfig.data">
+            <el-form-item label="应用">
+              <el-select v-model="searchFormConfig.data.appId" placeholder="请选择应用" style="width: 100%">
+                <el-option
+                  v-for="item in searchFormConfig.appOption.options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
             <el-form-item label="编码">
               <el-input v-model="searchFormConfig.data.code" placeholder="编码"></el-input>
             </el-form-item>
@@ -129,7 +139,7 @@
           <el-input type="textarea" v-model="menuFormConfig.data.description" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer" style="text-align:center;">
         <el-button @click="editDialogConfig.visible = false">取 消</el-button>
         <el-button type="primary" @click="menuSaveOrUpdate">确 定</el-button>
       </div>
@@ -142,7 +152,8 @@
 
   const searchFormInit = {
     code: '',
-    name: ''
+    name: '',
+    appId: ''
   }
 
   const menuFormInit = {
@@ -156,14 +167,15 @@
     parentId: '',
     type: 0,
     description: '',
-    parentName: ''
+    parentName: '',
+    level: ''
   }
 
   export default {
     name: 'menu',
     mounted () {
-      this.menuTreeConfig_initData()
-      this.search()
+//      this.menuTreeConfig_initData()
+//      this.search()
     },
     watch: {
       'menuTreeConfig.filterText': {
@@ -208,7 +220,7 @@
         }).then((response) => {
           let res = response.data
           if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
-            this.menuTreeConfig.data = res.data
+            this.menuTreeConfig.data = res.data ? res.data : []
           }
         }).catch(function (response) {
           console.log(response)
@@ -283,10 +295,18 @@
         })
       },
       openEditDialog (e, data, type) {
+        if (!this.menuTreeConfig.appId) {
+          this.$message.warning('请选择应用')
+          return
+        }
         // 初始化表单
         if (data) {
           this.menuFormConfig.data.parentId = data.id
           this.menuFormConfig.data.parentName = data.name
+          this.menuFormConfig.data.level = data.level + 1
+        } else {
+          this.menuFormConfig.data.parentId = 0
+          this.menuFormConfig.data.level = 1
         }
         if (type === 'add') this.menuFormConfig.data.appId = this.menuTreeConfig.appId
         else this.getEditDetail(data.id)
@@ -342,6 +362,7 @@
                   formData.type = res.data.type
                   formData.description = res.data.description
                   formData.icon = res.data.icon
+                  formData.level = res.data.level
               } else {
                 this.$message.error(res.msg)
             }
@@ -388,7 +409,17 @@
           }
         },
         searchFormConfig: {
-          data: JSON.parse(JSON.stringify(searchFormInit))
+          data: JSON.parse(JSON.stringify(searchFormInit)),
+          appOption: {
+            default: '',
+            options: [{
+              label: 'rbac后台管理',
+              value: 1
+            }, {
+              label: '门户网站',
+              value: 2
+            }]
+          }
         },
         editDialogConfig: {
            visible: false,

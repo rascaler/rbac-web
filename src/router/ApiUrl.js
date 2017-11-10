@@ -1,5 +1,7 @@
 const API_URL = {
   EXAMPLE: 'static/user.json',
+  KAPTCHA: 'images/kaptcha.jpg',
+  LOGIN: 'auth/login',
   USER: {
     PAGE_USERS: 'user/pageUsers',
     SAVE: 'user/save',

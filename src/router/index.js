@@ -7,6 +7,8 @@ import role from '@/pages/role'
 import login from '@/pages/login'
 import privilege from '@/pages/privilege'
 import menu from '@/pages/menu'
+import App from '@/App'
+import Login from '@/Login'
 // test
 import tableTest2 from '@/pages/test/tableTest2'
 import tableTest from '@/pages/test/tableTest'
@@ -79,6 +81,16 @@ export default new Router({
       path: '/formTest',
       name: 'formTest',
       component: formTest
+    },
+    {
+      path: '/App',
+      name: 'App',
+      component: App
+    },
+    {
+      path: '/Login',
+      name: 'Login',
+      component: Login
     }
   ]
 })
