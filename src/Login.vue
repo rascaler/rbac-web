@@ -32,6 +32,8 @@
 <script>
   import CONSTANT from './commons/constant'
 //  import App from './App'
+//  import Vue from 'vue'
+//  import router from './router'
   export default {
     data () {
       var validatePass = (rule, value, callback) => {
@@ -73,19 +75,19 @@
         this.kaptcha = CONSTANT.API_URL.KAPTCHA + '?t=' + Math.random()
       },
       login () {
-          this.$router.push('App')
-//        this.$http.post(CONSTANT.API_URL.LOGIN, this.loginFormConfig.data, {emulateJSON: true})
-//          .then((response) => {
-//            let res = response.data
-//            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
-//
-//            } else {
-//              this.$message.error(res.msg)
-//            }
-//            // 将新节点加入
-//          }).catch((response) => {
-//          this.$message.error('保存失败')
-//        })
+        this.$http.post(CONSTANT.API_URL.AUTH.LOGIN, this.loginFormConfig.data, {emulateJSON: true})
+          .then((response) => {
+            let res = response.data
+            if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
+              if (res.data !== null) window.location.href = CONSTANT.API_URL.ORIGIN
+              else this.$message.error(res.msg)
+            } else {
+              this.$message.error(res.msg)
+            }
+            // 将新节点加入
+          }).catch((response) => {
+          this.$message.error('登录失败')
+        })
       }
     }
   }
