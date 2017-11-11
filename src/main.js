@@ -36,7 +36,17 @@ Vue.config.productionTip = false
 // 跨域携带cookie
 Vue.http.interceptors.push(function (request, next) {
   request.credentials = true
-  next()
+  // request.headers.set('x-requested-with', 'vue-resource-request')
+  next((response) => {
+    let res = response.data
+    if (res && res.ecode === CONSTANT.ResponseCode.USER_ERR_UNLOGINED) {
+      ElementUI.Message.error('您尚未登录或登录时间过长,请重新登录!')
+        setTimeout(() => {
+          window.location.href = CONSTANT.API_URL.ORIGIN
+        }, 3000)
+    }
+    return response
+  })
 })
 // 查询身份认证
 Vue.http.get(CONSTANT.API_URL.AUTH.VALIDATE_AUTH, {
