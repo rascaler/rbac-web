@@ -55,36 +55,15 @@ Vue.http.get(CONSTANT.API_URL.AUTH.VALIDATE_AUTH, {
   let res = response.data
   if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
     Vue.auth = res.data
-    let app = new Vue({
-      el: '#app',
-      router,
-      template: Vue.auth ? '<App/>' : '<Login/>',
-      components: Vue.auth ? { App } : { Login }
-    })
-    console.log(app)
-  } else {}
+    initApp(Vue.auth)
+  } else {
+    initApp(false)
+  }
 }).catch((response) => {
+  initApp(false)
 })
 /* eslint-disable no-new */
-// new Vue({
-//   el: '#app',
-//   router,
-//   template: Vue.auth ? '<App>' : '<Login/>',
-//   components: Vue.auth ? { App } : { Login }
-// })
 
-// new Vue({
-//   el: '#app',
-//   router,
-//   template: '<test1/>',
-//   components: { test1 }
-// })
-// new Vue({
-//   el: '#app2',
-//   router,
-//   template: '<App/>',
-//   components: { App }
-// })
 function buildUrl (domain, apiUrlObj) {
   if (!(apiUrlObj instanceof Object)) return
   for (let item in apiUrlObj) {
@@ -94,4 +73,14 @@ function buildUrl (domain, apiUrlObj) {
       apiUrlObj[item] = domain + apiUrlObj[item]
     }
   }
+}
+
+function initApp (auth) {
+  let app = new Vue({
+    el: '#app',
+    router,
+    template: auth ? '<App/>' : '<Login/>',
+    components: auth ? { App } : { Login }
+  })
+  console.log(app.name)
 }
