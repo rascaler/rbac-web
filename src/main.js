@@ -4,22 +4,24 @@ import Vue from 'vue'
 import App from './App'
 import Login from './Login'
 import router from './router'
-import VueResource from 'vue-resource'
+// import VueResource from 'vue-resource'
 import ElementUI from 'element-ui'
 import ResponseCode from './commons/ResponseCode'
 import Validator from './commons/validator'
 import CONSTANT from './commons/constant'
 import 'element-ui/lib/theme-default/index.css'
+import axios from 'axios'
+import qs from 'qs'
 
 Vue.use(ElementUI)
-Vue.use(VueResource)
+// Vue.use(VueResource)
 // mock dev prod
 const env = 'dev'
 
 // 分环境配置
 if (env === 'dev' || env === 'prod') {
   let API_URL = require('./router/ApiUrl').default
-  buildUrl('http://localhost:9090/rbac/', API_URL)
+  buildUrl('/rbac/', API_URL)
   CONSTANT.API_URL = API_URL
   CONSTANT.API_URL.ORIGIN = 'http://localhost:8888/'
 } else {
@@ -31,60 +33,49 @@ if (env === 'dev' || env === 'prod') {
 CONSTANT.ResponseCode = ResponseCode
 CONSTANT.Validator = Validator
 
-Vue.config.productionTip = false
+Vue.prototype.$http = axios
+Vue.prototype.$qs = qs
 
-// 跨域携带cookie
-Vue.http.interceptors.push(function (request, next) {
-  request.credentials = true
-  // request.headers.set('x-requested-with', 'vue-resource-request')
-  next((response) => {
-    let res = response.data
-    if (res && res.ecode === CONSTANT.ResponseCode.USER_ERR_UNLOGINED) {
-      ElementUI.Message.error('您尚未登录或登录时间过长,请重新登录!')
-        setTimeout(() => {
-          window.location.href = CONSTANT.API_URL.ORIGIN
-        }, 3000)
-    }
-    return response
-  })
+axios.interceptors.response.use((response) => {
+  // 对响应数据做点什么
+  let res = response.data
+  if (res && res.ecode === CONSTANT.ResponseCode.USER_ERR_UNLOGINED) {
+    ElementUI.Message.error('您尚未登录或登录时间过长,请重新登录!')
+      setTimeout(() => {
+        window.location.href = CONSTANT.API_URL.ORIGIN
+      }, 3000)
+  }
+  return response
+}, (error) => {
+  // 对响应错误做点什么
+  return Promise.reject(error)
 })
+
 // 查询身份认证
-Vue.http.get(CONSTANT.API_URL.AUTH.VALIDATE_AUTH, {
+axios.get(CONSTANT.API_URL.AUTH.VALIDATE_AUTH, {
   params: {}
 }).then((response) => {
   let res = response.data
   if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
     Vue.auth = res.data
-    let app = new Vue({
+    /* eslint-disable no-new */
+    new Vue({
       el: '#app',
       router,
       template: Vue.auth ? '<App/>' : '<Login/>',
       components: Vue.auth ? { App } : { Login }
     })
-    console.log(app)
   } else {}
 }).catch((response) => {
+  /* eslint-disable no-new */
+  new Vue({
+    el: '#app',
+    router,
+    template: '<Login/>',
+    components: { Login }
+  })
 })
-/* eslint-disable no-new */
-// new Vue({
-//   el: '#app',
-//   router,
-//   template: Vue.auth ? '<App>' : '<Login/>',
-//   components: Vue.auth ? { App } : { Login }
-// })
 
-// new Vue({
-//   el: '#app',
-//   router,
-//   template: '<test1/>',
-//   components: { test1 }
-// })
-// new Vue({
-//   el: '#app2',
-//   router,
-//   template: '<App/>',
-//   components: { App }
-// })
 function buildUrl (domain, apiUrlObj) {
   if (!(apiUrlObj instanceof Object)) return
   for (let item in apiUrlObj) {

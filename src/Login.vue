@@ -75,7 +75,7 @@
         this.kaptcha = CONSTANT.API_URL.KAPTCHA + '?t=' + Math.random()
       },
       login () {
-        this.$http.post(CONSTANT.API_URL.AUTH.LOGIN, this.loginFormConfig.data, {emulateJSON: true})
+        this.$http.post(CONSTANT.API_URL.AUTH.LOGIN, this.$qs.stringify(this.loginFormConfig.data))
           .then((response) => {
             let res = response.data
             if (res && res.ecode === CONSTANT.ResponseCode.SUCCESS) {
@@ -86,7 +86,7 @@
             }
             // 将新节点加入
           }).catch((response) => {
-          this.$message.error('登录失败')
+            this.$message.error('登录失败')
         })
       }
     }
